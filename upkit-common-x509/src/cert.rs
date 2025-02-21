@@ -31,7 +31,6 @@ pub mod types {
     mod validity;
 
     pub use self::distinguished_name::*;
-    pub use self::general_name::general_name_as_string;
     pub use self::general_name::WellKnownGeneralName;
     pub use self::identity_fragment::*;
     pub use self::serial_number::SerialNumber;

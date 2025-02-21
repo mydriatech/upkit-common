@@ -189,7 +189,7 @@ fn instance() -> &'static ExtendedKeyUsageLookup {
     INSTANCE.deref()
 }
 
-/** Common X.509 Certificate Extended Key Usage.
+/** Common Extended Key Usages.
 
 See [RFC5280 4.2.1.12](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.2.1.12).
  */

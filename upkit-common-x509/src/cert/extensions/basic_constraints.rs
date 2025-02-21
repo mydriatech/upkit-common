@@ -15,14 +15,14 @@
     limitations under the License.
 */
 
-//! X.509 Certificate Basic Constraints extension.
+//! X.509 Certificate Basic Constraints.
 
 use serde::Deserialize;
 use serde::Serialize;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
 
-/** X.509 Certificate Basic Constraints extension.
+/** Basic Constraints.
 
 See [RFC5280 4.2.1.9](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.2.1.9).
 */

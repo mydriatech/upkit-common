@@ -24,7 +24,7 @@ use serde::Serialize;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
 
-/** X.509 Certificate Key Usage.
+/** Key Usage.
 
 See [RFC5280 4.2.1.3](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.2.1.3).
 */

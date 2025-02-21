@@ -216,8 +216,3 @@ impl WellKnownGeneralName {
         GeneralName::RegisteredId(ObjectIdentifier::new(oid).unwrap())
     }
 }
-
-/// Return the String representation of the [GeneralName] type if it is well-known.
-pub fn general_name_as_string(general_name: &rasn_pkix::GeneralName) -> Option<String> {
-    WellKnownGeneralName::from_rasn_type(general_name).map(|(wkgn, _)| wkgn.as_name())
-}

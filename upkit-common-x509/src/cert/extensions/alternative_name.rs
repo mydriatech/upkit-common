@@ -27,7 +27,7 @@ SubjectAltName ::= GeneralNames
 GeneralNames ::= SEQUENCE SIZE (1..MAX) OF GeneralName
 */
 
-/** X.509 Certificate Alternative Name.
+/** Alternative Name.
 
 See [RFC5280 4.2.1.6](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.2.1.6).
 See [RFC5280 4.2.1.7](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.2.1.7).
