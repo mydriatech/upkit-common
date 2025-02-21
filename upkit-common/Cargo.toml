@@ -1,0 +1,20 @@
+[package]
+name = "upkit_common"
+version = "0.0.0"
+edition = "2021"
+description = "UPKIT common utilities"
+license = "Apache-2.0 WITH AdditionRef-FWM-Exception-1.0.0"
+#publish = false
+
+#[[bench]]
+#name = "all"
+#harness = false
+
+#[package.metadata.docs.rs]
+#all-features = true
+
+[dependencies]
+upkit_common_x509 = { path = "../upkit-common-x509" }
+
+#[dev-dependencies]
+#[features]
