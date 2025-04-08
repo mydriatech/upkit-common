@@ -164,7 +164,7 @@ impl WellKnownGeneralName {
     fn to_registrered_id(oid: &ObjectIdentifier) -> (Self, String) {
         (
             WellKnownGeneralName::RegisteredId,
-            crate::encdec::oid::as_string(oid),
+            tyst::encdec::oid::as_string(oid),
         )
     }
 
@@ -212,7 +212,7 @@ impl WellKnownGeneralName {
     }
 
     fn as_registrered_id(oid: &str) -> GeneralName {
-        let oid = crate::encdec::oid::from_string(oid).unwrap();
+        let oid = tyst::encdec::oid::from_string(oid).unwrap();
         GeneralName::RegisteredId(ObjectIdentifier::new(oid).unwrap())
     }
 }

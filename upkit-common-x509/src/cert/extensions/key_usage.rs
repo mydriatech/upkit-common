@@ -86,6 +86,12 @@ impl KeyUsage {
             .unwrap()
     }
 
+    /// Return the index of the [KeyUsage] where 0 means [Self::DigitalSignature]
+    /// and 8 means [Self::DecipherOnly].
+    pub fn from_index(index: usize) -> Option<Self> {
+        Self::MSB_ORDERED_KUS.get(index).cloned()
+    }
+
     /// Convert a slice of [KeyUsage] to [BitString].
     pub fn to_rasn_type(key_usages: &[KeyUsage]) -> BitString {
         let mut bv = BitVec::<u8, bitvec::order::Msb0>::new();

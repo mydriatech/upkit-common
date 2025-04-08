@@ -15,7 +15,6 @@
     limitations under the License.
 */
 
-use std::path::PathBuf;
 use std::sync::Arc;
 use upkit_common_x509::cert::extensions::CertificatePolicy;
 use upkit_common_x509::cert::extensions::ExtendedKeyUsage;
@@ -102,7 +101,7 @@ fn load_b64_file(relative_path: &str) -> Vec<u8> {
 }
 
 fn load_test_resource_file(relative_path: &str) -> String {
-    let mut file_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let mut file_path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     file_path.push("resources/test");
     file_path.push(relative_path);
     let full_filename = file_path.display().to_string();

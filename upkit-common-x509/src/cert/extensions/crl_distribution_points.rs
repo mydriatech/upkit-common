@@ -32,7 +32,7 @@ use rasn_pkix::GeneralName;
 /// * RFC5280 "RECOMMENDS against segmenting CRLs by reason code" (unsupported)
 /// * Real world support for indirect CRLs can't be relied upon. (unsupported)
 /// * Having multiple alternative locations for retrieving the same CRL is not
-///     very practical in the real world.
+///   very practical in the real world.
 ///
 /// -> Suppport parsing, but use a single CA signed CDP when building certs.
 pub struct CrlDistributionPoint {}
@@ -41,6 +41,9 @@ impl CrlDistributionPoint {
     // joint-iso-ccitt(2) ds(5) ce(29) cRLDistributionPoints(31)
     /// CRL Distribution Points object identifier
     pub const OID: &[u32] = &[2, 5, 29, 31];
+    // id-ce-freshestCRL OBJECT IDENTIFIER ::=  { id-ce 46 }
+    /// Freshest CRL (a.k.a. Delta CRL Distribution Point)
+    pub const OID_DELTA_CDP: &[u32] = &[2, 5, 29, 46];
 
     /// Return a CA issued CDP URI for all revocation reasons if present. Preferr http over ldap.
     pub fn from_rasn_type(cdps: &SequenceOf<DistributionPoint>) -> Option<String> {

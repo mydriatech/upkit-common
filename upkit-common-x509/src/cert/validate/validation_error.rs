@@ -41,6 +41,8 @@ pub enum CertificateValidationErrorKind {
     UnhandledCriticalExtensions,
     /// Rejected certificate while verifying one of the certificate extensions.
     ExtensionHandlingFailure,
+    /// Partially or completely missing
+    IncompleteData,
 }
 
 impl CertificateValidationErrorKind {

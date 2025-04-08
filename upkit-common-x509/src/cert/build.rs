@@ -138,6 +138,11 @@ impl NoSignatureTbsCertificate {
         }
     }
 
+    /// Transform the TBSCertificate into a encoded signed Certificate.
+    pub fn to_certificate_bytes(&self, signature_algorithm: &[u8], signature: Vec<u8>) -> Vec<u8> {
+        rasn::der::encode(&self.to_certificate(signature_algorithm, signature)).unwrap()
+    }
+
     /// Return a new instance from the `rasn` ASN.1 library type.
     pub fn from_rasn_type(tbs_certificate: &TbsCertificate) -> Self {
         if !Self::no_signature_algorithm_identifier().eq(&tbs_certificate.signature) {

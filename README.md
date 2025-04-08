@@ -25,8 +25,17 @@ Add the following to `Cargo.toml`:
 upkit_common = { git = "https://github.com/mydriatech/upkit-common.git", branch = "main" }
 ```
 
-See [`test_cert_paths.rs`](upkit-common-x509/tests/test_cert_paths.rs) for an
-example of X.509 certificate parsing from PEM and certificate chain validation.
+## Components
+
+### [`upkit-common-x509/`](upkit-common-x509/)
+
+Pure Rust X.509 utility implementations free from
+[unsafe](https://doc.rust-lang.org/reference/unsafe-keyword.html) code.
+
+### Additional components
+
+* [`upkit-common/`](upkit-common/): Library entry point and aggregation of the
+other modules.
 
 
 ## Limitations

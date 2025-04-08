@@ -67,7 +67,7 @@ impl BasicConstraints {
     }
 
     /// Return the number of subordinate levels (including a leaf) that this CA
-    /// allows.
+    /// allows. 0 hence means that no sub-CAs are allowed.
     pub fn path_len(&self) -> Option<usize> {
         if self.ca {
             self.path_len
