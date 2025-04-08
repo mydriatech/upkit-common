@@ -27,6 +27,9 @@ crossbeam-skiplist = { version = "0.1", default-features = true }
 # https://docs.rs/rasn/latest/rasn/
 rasn = { workspace = true, features = []  }
 rasn-pkix = { workspace = true, features = []  }
+rasn-cms = { workspace = true, features = []  }
+rasn-ocsp = { workspace = true, features = []  }
+rasn-smime = { workspace = true, features = []  }
 bitvec = { version = "1.0", default-features = false, features = ["alloc"] }
 num-bigint = { version = "0.4", default-features = false }
 chrono = { version = "0.4", default-features = false, features = ["alloc", "now"] }
@@ -35,7 +38,7 @@ chrono = { version = "0.4", default-features = false, features = ["alloc", "now"
 idna = { version = "1.0", default-features = true, features = [] }
 
 serde = { workspace = true, features = [] }
-serde_json = { workspace = true, features = [] }
+#serde_json = { workspace = true, features = [] }
 serde_with = { workspace = true, features = [] }
 
 # Converting simple enums to String

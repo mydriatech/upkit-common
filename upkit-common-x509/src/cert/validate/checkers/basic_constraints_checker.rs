@@ -37,19 +37,31 @@ impl ExtensionChecker for BasicConstraintsChecker {
         chain_with_trust: &[CertificateParser],
         unresolved_extensions: &SkipSet<Vec<u32>>,
     ) -> Result<(), CertificateValidationError> {
-        let ok = chain_with_trust
+        // The provided chain could be an excerpt from a much larger chain, so
+        // make no assumptions here about the length.
+        // if first one is a leaf, skip 1 to get the enumeration right
+        let mut skip_first = 0;
+        if chain_with_trust
+            .first()
+            .and_then(CertificateParser::get_basic_constraints)
+            .as_ref()
+            .is_none_or(BasicConstraints::is_leaf)
+        {
+            skip_first = 1;
+        }
+        let failed_item = chain_with_trust
             .iter()
+            .skip(skip_first)
             .enumerate()
-            .skip(1)
             .map(|(i, cp)| (i, cp.get_basic_constraints()))
-            .any(|(i, basic_constraints)| {
-                !Self::is_ca_with_sufficient_path_len(basic_constraints, i)
+            .find(|(i, basic_constraints)| {
+                !Self::is_ca_with_sufficient_path_len(basic_constraints, i.to_owned())
             });
-        if ok {
-            unresolved_extensions.remove(BasicConstraints::OID);
-        } else {
+        if let Some((required_path_len, basic_constraints)) = failed_item {
             return Err(CertificateValidationErrorKind::ExtensionHandlingFailure
-                .error_with_msg("Failed check of Basic Constraints."));
+                .error_with_msg(&format!("Failed check of Basic Constraints '{basic_constraints:?}' since required path length was {required_path_len}.")));
+        } else {
+            unresolved_extensions.remove(BasicConstraints::OID);
         }
         Ok(())
     }
@@ -59,10 +71,10 @@ impl BasicConstraintsChecker {
     /// Ignore leaf and check that the rest are marked as CAs and have
     /// sufficient path len for this chain.
     fn is_ca_with_sufficient_path_len(
-        basic_constraints: Option<BasicConstraints>,
+        basic_constraints: &Option<BasicConstraints>,
         required_path_len: usize,
     ) -> bool {
-        basic_constraints.is_some_and(|basic_constraints| {
+        basic_constraints.as_ref().is_some_and(|basic_constraints| {
             basic_constraints.is_ca()
                 && basic_constraints
                     .path_len()
@@ -80,15 +92,15 @@ mod test {
     fn check_basic_constraints_checker() {
         init_logger();
         assert!(!BasicConstraintsChecker::is_ca_with_sufficient_path_len(
-            Some(BasicConstraints::new_leaf()),
+            &Some(BasicConstraints::new_leaf()),
             0
         ));
         assert!(BasicConstraintsChecker::is_ca_with_sufficient_path_len(
-            Some(BasicConstraints::new_ca(None)),
+            &Some(BasicConstraints::new_ca(None)),
             3
         ));
         assert!(BasicConstraintsChecker::is_ca_with_sufficient_path_len(
-            Some(BasicConstraints::new_ca(Some(3))),
+            &Some(BasicConstraints::new_ca(Some(3))),
             3
         ));
     }

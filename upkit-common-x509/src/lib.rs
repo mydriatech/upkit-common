@@ -20,8 +20,12 @@
 #![doc = include_str!("../README.md")]
 
 pub mod cert;
+pub mod cms;
+pub mod crl;
 pub mod encdec;
 mod named_enum;
+pub mod ocsp;
+pub mod tsp;
 
 use tyst::{encdec::hex::ToHex, Tyst};
 

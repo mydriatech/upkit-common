@@ -18,6 +18,7 @@
 //! Common markers from [RFC7468 4](https://datatracker.ietf.org/doc/html/rfc7468#section-4)
 
 /// See [RFC7468 4](https://datatracker.ietf.org/doc/html/rfc7468#section-4).
+#[derive(Debug, PartialEq, Eq)]
 pub enum Marker {
     /// Data is of ASN.1 Type RFC5280 Certificate.
     Certificate,

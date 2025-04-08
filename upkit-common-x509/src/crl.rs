@@ -15,27 +15,21 @@
     limitations under the License.
 */
 
-//! Object Identifier String encode and decode.
+//! X.509 Certificate Revocation List (CRL) utilities.
 
-pub use super::DecodingError;
-use std::num::ParseIntError;
+pub mod crl_entry_extensions;
+pub mod crl_extensions;
+pub mod parse {
+    //! X.509 Certificate Revocation List (CRL) parser.
+    mod crl_parser;
+    mod parsing_error;
 
-/// Convert a String of numbers with '.' as separator into a vector.
-pub fn from_string(oid: &str) -> Result<Vec<u32>, DecodingError> {
-    Ok(oid
-        .split(".")
-        .map(|part| {
-            part.parse()
-                .map_err(|e: ParseIntError| DecodingError::with_msg(&e.to_string()))
-                .unwrap()
-        })
-        .collect::<Vec<u32>>())
+    pub use crl_parser::*;
+    pub use parsing_error::*;
 }
+pub mod validate {
+    //! X.509 Certificate Revocation List (CRL) validation.
+    mod crl_validator;
 
-/// Convert sequence of numbers into String using '.' as separator.
-pub fn as_string(oid: &[u32]) -> String {
-    oid.iter()
-        .map(|part| part.to_string())
-        .collect::<Vec<_>>()
-        .join(".")
+    pub use crl_validator::*;
 }

@@ -21,36 +21,54 @@ use super::CertificateParser;
 use super::CertificateValidationError;
 use super::CertificateValidationErrorKind;
 use super::ExtensionChecker;
+use crate::cert::extensions::BasicConstraints;
 use crate::cert::extensions::KeyUsage;
 use crossbeam_skiplist::SkipSet;
 
 /** X.509 Certificate Key Usage validation.
 
-See [RFC5280 4.2.1.3](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.2.1.3).
+[RFC5280 4.2.1.3](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.2.1.3)
+states:
+
+```text
+   CAs MUST include this extension in certificates that contain public keys that
+   are used to validate digital signatures on other public key certificates or
+   CRLs.
+```
+
+Basically this makes the leaf certificate KU optional to include.
  */
 pub struct KeyUsageChecker {
     leaf_kus: Vec<KeyUsage>,
     issuer_kus: Vec<KeyUsage>,
+    strict_non_repudiation: bool,
 }
 impl Default for KeyUsageChecker {
     /// Return a new instance with minimal set of required [KeyUsage]s.
     ///
     /// By default only [KeyUsage::KeyCertSign] is required for CA certs and
-    /// [KeyUsage::DigitalSignature] for leaf certificates,
+    /// [KeyUsage::DigitalSignature] or [KeyUsage::NonRepudiation] for leaf
+    /// certificates,
     fn default() -> Self {
         Self::new(
-            vec![KeyUsage::DigitalSignature],
+            vec![KeyUsage::NonRepudiation],
             vec![KeyUsage::KeyCertSign],
+            false,
         )
     }
 }
 
 impl KeyUsageChecker {
     /// Return a new instance with custom [KeyUsage] requirements.
-    pub fn new(required_leaf_kus: Vec<KeyUsage>, required_issuer_kus: Vec<KeyUsage>) -> Self {
+    pub fn new(
+        required_leaf_kus: Vec<KeyUsage>,
+        required_issuer_kus: Vec<KeyUsage>,
+        strict_non_repudiation: bool,
+    ) -> Self {
         Self {
             leaf_kus: required_leaf_kus,
             issuer_kus: required_issuer_kus,
+            strict_non_repudiation,
         }
     }
 }
@@ -63,26 +81,40 @@ impl ExtensionChecker for KeyUsageChecker {
     ) -> Result<(), CertificateValidationError> {
         let mut msg = String::new();
         let failure = chain_with_trust.iter().enumerate().any(|(i, cp)| {
-            let required_kus = if i > 0 {
-                &self.issuer_kus
-                // Check: Must have "Certificate Sign" to have issued cert
-            } else {
+            let is_leaf = cp.get_basic_constraints().as_ref().is_none_or(BasicConstraints::is_leaf);
+            let required_kus =
+            if is_leaf {
                 // Check: Allow any or KUs provided in non-default constructor
-                //self.leaf_kus;
                 &self.leaf_kus
+            } else {
+                // Check: Must have "Certificate Sign" to have issued cert
+                &self.issuer_kus
             };
             let failure = if let Some(ku) = cp.get_key_usage() {
-                required_kus
-                    .iter()
-                    .any(|required_key_usage| !ku[required_key_usage.index()])
+                required_kus.iter().any(|required_key_usage| {
+                    if required_key_usage.eq(&KeyUsage::NonRepudiation)
+                        && !self.strict_non_repudiation
+                    {
+                        !ku.contains(required_key_usage) && !ku.contains(&KeyUsage::DigitalSignature)
+                    } else {
+                        !ku.contains(required_key_usage)
+                    }
+                })
             } else {
-                !required_kus.is_empty()
+                !is_leaf && !required_kus.is_empty()
             };
             if failure {
-                msg = format!(
-                    "[{i}]: Missing KeyUsage(s). Required: {required_kus:?}, Actual: {:?}",
-                    cp.get_key_usage()
+                if !self.strict_non_repudiation && required_kus.contains(&KeyUsage::NonRepudiation) && !required_kus.contains(&KeyUsage::DigitalSignature) {
+                    msg = format!(
+                        "[{i}]: Missing KeyUsage(s). Required: {required_kus:?} (DigitalSignature is accepted instead of NonRepudiation), Actual: {:?}",
+                        cp.get_key_usage()
                 );
+                } else {
+                    msg = format!(
+                        "[{i}]: Missing KeyUsage(s). Required: {required_kus:?}, Actual: {:?}",
+                        cp.get_key_usage()
+                    );
+                }
             }
             failure
         });

@@ -25,6 +25,8 @@ mod crl_distribution_points;
 mod extended_key_usage;
 mod key_identifier;
 mod key_usage;
+mod ocsp_no_check;
+mod private_key_usage_period;
 
 pub use self::alternative_name::AlternativeName;
 pub use self::authority_information_access::AuthorityInfoAccessDescription;
@@ -36,22 +38,25 @@ pub use self::extended_key_usage::ExtendedKeyUsage;
 pub use self::key_identifier::AuthorityKeyIdentifier;
 pub use self::key_identifier::SubjectKeyIdentifier;
 pub use self::key_usage::KeyUsage;
+pub use self::ocsp_no_check::OcspNoCheck;
+pub use self::private_key_usage_period::PrivateKeyUsagePeriod;
 use super::types::WellKnownGeneralName;
 use rasn::error::EncodeError;
 use rasn::types::ObjectIdentifier;
 use rasn::types::OctetString;
 
-// TODO
-// PrivateKeyUsagePeriod
-// MS Templates certificate extension 1.3.6.1.4.1.311.20.2
-// Certificate template v2            1.3.6.1.4.1.311.21.7
-// MS app policies extension          1.3.6.1.4.1.311.21.10
-// MS objectSid OtherName             1.3.6.1.4.1.311.25.2.1 szOID_NTDS_OBJECTSID
-// CT (Certificate Transparency) specific extensions   1.3.6.1.4.1.11129.2.4.6
-// CT (Certificate Transparency) precert poisoning ext 1.3.6.1.4.1.11129.2.4.3
+/*
+TODO: Add support for the following extensions
+    CT (Certificate Transparency) specific extensions    1.3.6.1.4.1.11129.2.4.6
+    CT (Certificate Transparency) precert poisoning ext  1.3.6.1.4.1.11129.2.4.3
+    MS Templates certificate extension                   1.3.6.1.4.1.311.20.2
+    MS Certificate template v2                           1.3.6.1.4.1.311.21.7
+    MS app policies extension                            1.3.6.1.4.1.311.21.10
+    MS objectSid OtherName (szOID_NTDS_OBJECTSID)        1.3.6.1.4.1.311.25.2.1
+*/
 
 /// X.509 Certificate extensions.
-#[derive(Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Extensions {
     extensions: Vec<rasn_pkix::Extension>,
 }
@@ -207,5 +212,24 @@ impl Extensions {
             )
             .unwrap();
         }
+    }
+
+    /// See [OcspNoCheck] for details.
+    pub fn add_ocsp_no_check(&mut self) {
+        self.add_extension(OcspNoCheck::OID, false, &rasn::der::encode(&()).unwrap())
+            .unwrap();
+    }
+
+    /// See [PrivateKeyUsagePeriod] for details.
+    pub fn add_private_key_usage_period(
+        &mut self,
+        private_key_usage_period: &PrivateKeyUsagePeriod,
+    ) {
+        self.add_extension(
+            PrivateKeyUsagePeriod::OID,
+            false,
+            &private_key_usage_period.to_rasn_type(),
+        )
+        .unwrap();
     }
 }

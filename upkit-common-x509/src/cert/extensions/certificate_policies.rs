@@ -240,10 +240,7 @@ impl CertificatePolicy {
             notice_ref: notice_ref.to_owned().map(|(organization, notice_numbers)| {
                 NoticeReference {
                     organisation: DisplayText::Utf8String(organization),
-                    notice_numbers: notice_numbers
-                        .iter()
-                        .map(|n| Integer::Primitive(*n))
-                        .collect(),
+                    notice_numbers: notice_numbers.iter().map(|n| Integer::from(*n)).collect(),
                 }
             }),
             // Displaytext is 1..200 chars

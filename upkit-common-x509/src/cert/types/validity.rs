@@ -17,7 +17,6 @@
 
 //! Certificate Validity.
 
-use chrono::TimeZone;
 use serde::Deserialize;
 use serde::Serialize;
 use serde_with::serde_as;
@@ -79,6 +78,11 @@ impl Validity {
         u64::try_from(chrono::Utc::now().timestamp()).unwrap()
     }
 
+    /// Return `not_before` as number of seconds since 1970-01-01 00:00:00.
+    pub fn get_not_before(&self) -> u64 {
+        self.not_before_epoch_seconds
+    }
+
     /// Return `not_after` as number of seconds since 1970-01-01 00:00:00.
     pub fn get_not_after(&self) -> u64 {
         self.not_after_epoch_seconds
@@ -98,35 +102,20 @@ impl Validity {
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
     pub fn to_rasn_type(&self) -> rasn_pkix::Validity {
         rasn_pkix::Validity {
-            not_before: Self::to_rasn_epoch_seconds(self.not_before_epoch_seconds),
-            not_after: Self::to_rasn_epoch_seconds(self.not_after_epoch_seconds),
+            not_before: crate::encdec::rasn::to_rasn_epoch_seconds(self.not_before_epoch_seconds),
+            not_after: crate::encdec::rasn::to_rasn_epoch_seconds(self.not_after_epoch_seconds),
         }
     }
 
     /// Return a new instance from the `rasn` ASN.1 library type.
     pub fn from_rasn_type(validity: &rasn_pkix::Validity) -> Self {
         Self {
-            not_before_epoch_seconds: Self::from_rasn_epoch_seconds(&validity.not_before),
-            not_after_epoch_seconds: Self::from_rasn_epoch_seconds(&validity.not_after),
+            not_before_epoch_seconds: crate::encdec::rasn::from_rasn_epoch_seconds(
+                &validity.not_before,
+            ),
+            not_after_epoch_seconds: crate::encdec::rasn::from_rasn_epoch_seconds(
+                &validity.not_after,
+            ),
         }
-    }
-
-    /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    fn to_rasn_epoch_seconds(epoch_seconds: u64) -> rasn_pkix::Time {
-        let date_time_utc = chrono::Utc
-            .timestamp_micros(i64::try_from(epoch_seconds * 1_000_000).unwrap())
-            .unwrap();
-        // Certificate validity dates in 2050 or later MUST be encoded as GeneralizedTime
-        //rasn_pkix::Time::Utc(date_time_utc)
-        rasn_pkix::Time::General(date_time_utc.fixed_offset())
-    }
-
-    /// Return a new instance from the `rasn` ASN.1 library type.
-    fn from_rasn_epoch_seconds(time: &rasn_pkix::Time) -> u64 {
-        u64::try_from(match time {
-            rasn_pkix::Time::Utc(datetime_utc) => datetime_utc.timestamp(),
-            rasn_pkix::Time::General(datetime_fixed_offset) => datetime_fixed_offset.timestamp(),
-        })
-        .unwrap()
     }
 }

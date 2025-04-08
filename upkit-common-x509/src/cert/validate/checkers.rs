@@ -22,12 +22,16 @@ mod certificate_policies_checker;
 mod extended_key_usage_checker;
 mod key_identifier_checker;
 mod key_usage_checker;
+mod ocsp_no_check_checker;
+mod private_key_usage_period_checker;
 
 pub use self::basic_constraints_checker::BasicConstraintsChecker;
 pub use self::certificate_policies_checker::CertificatePoliciesChecker;
 pub use self::extended_key_usage_checker::ExtendedKeyUsageChecker;
 pub use self::key_identifier_checker::KeyIdentifierChecker;
 pub use self::key_usage_checker::KeyUsageChecker;
+pub use self::ocsp_no_check_checker::OcspNoCheckChecker;
+pub use self::private_key_usage_period_checker::PrivateKeyUsagePeriodChecker;
 use super::CertificateParser;
 use super::CertificateValidationError;
 use super::CertificateValidationErrorKind;
