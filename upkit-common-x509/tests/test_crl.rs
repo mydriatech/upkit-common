@@ -15,6 +15,7 @@
     limitations under the License.
 */
 
+use upkit_common_util::testing::*;
 use upkit_common_x509::cert::parse::CertificateParser;
 use upkit_common_x509::cert::parse::CertificateParsingError;
 use upkit_common_x509::crl::parse::CrlParser;
@@ -22,17 +23,9 @@ use upkit_common_x509::crl::parse::CrlParsingError;
 use upkit_common_x509::crl::validate::CertificateCrlValidator;
 use upkit_common_x509::encdec::pem::Marker;
 
-pub fn init_logger() {
-    let _ = env_logger::builder()
-        .is_test(true)
-        .filter_level(log::LevelFilter::Debug)
-        //.filter(Some("rustls"), log::LevelFilter::Info)
-        .try_init();
-}
-
 #[test]
 fn test_crl_real_world() {
-    init_logger();
+    initialize_env_logger();
 
     // Load certs and CRLS
     let root_ca = get_certificate_from_pem("crl/globaltrust-2015.pem").unwrap();
@@ -68,14 +61,14 @@ fn get_certificate_from_pem(
     relative_path: &str,
 ) -> Result<CertificateParser, CertificateParsingError> {
     CertificateParser::from_bytes(&get_single_item(
-        &load_test_resource_file(relative_path),
+        &load_resource_file_as_string(env!("CARGO_MANIFEST_DIR"), relative_path),
         &Marker::Certificate,
     ))
 }
 
 fn get_crl_from_pem(relative_path: &str) -> Result<CrlParser, CrlParsingError> {
     CrlParser::from_bytes(&get_single_item(
-        &load_test_resource_file(relative_path),
+        &load_resource_file_as_string(env!("CARGO_MANIFEST_DIR"), relative_path),
         &Marker::CertificateRevocationList,
     ))
 }
@@ -89,13 +82,4 @@ fn get_single_item(pem_str: &str, marker: &Marker) -> Vec<u8> {
         .map(|(_marker, bytes)| bytes)
         .next()
         .unwrap()
-}
-
-fn load_test_resource_file(relative_path: &str) -> String {
-    let mut file_path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    file_path.push("resources/test");
-    file_path.push(relative_path);
-    let full_filename = file_path.display().to_string();
-    log::trace!("Loading '{full_filename}'.");
-    std::fs::read_to_string(file_path).expect(&format!("Missing test data '{full_filename}'."))
 }

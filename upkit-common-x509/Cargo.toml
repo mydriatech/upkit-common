@@ -14,6 +14,7 @@ publish = false
 #all-features = true
 
 [dependencies]
+upkit_common_util = { path = "../upkit-common-util" }
 
 tyst = { workspace = true, features = [] }
 

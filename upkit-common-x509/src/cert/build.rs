@@ -17,6 +17,8 @@
 
 //! X.509 Certificate build.
 
+pub mod util;
+
 use super::extensions::Extensions;
 use super::types::DistinguishedName;
 use super::types::SerialNumber;

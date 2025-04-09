@@ -16,6 +16,7 @@
 */
 
 use std::sync::Arc;
+use upkit_common_util::testing::*;
 use upkit_common_x509::cert::extensions::CertificatePolicy;
 use upkit_common_x509::cert::extensions::ExtendedKeyUsage;
 use upkit_common_x509::cert::extensions::WellKnownCertificatePolicy;
@@ -24,17 +25,9 @@ use upkit_common_x509::cert::validate::checkers::CertificatePoliciesChecker;
 use upkit_common_x509::cert::validate::checkers::ExtendedKeyUsageChecker;
 use upkit_common_x509::cert::validate::CertificatePathValidator;
 
-pub fn init_logger() {
-    let _ = env_logger::builder()
-        .is_test(true)
-        .filter_level(log::LevelFilter::Debug)
-        //.filter(Some("rustls"), log::LevelFilter::Info)
-        .try_init();
-}
-
 #[test]
 fn test_cert_path() {
-    init_logger();
+    initialize_env_logger();
     let now_epoch_seconds = u64::try_from(
         std::time::SystemTime::now()
             .duration_since(std::time::SystemTime::UNIX_EPOCH)
@@ -58,9 +51,9 @@ fn test_cert_path() {
 
 #[test]
 fn test_cert_path_real_world() {
-    init_logger();
+    initialize_env_logger();
     // Load github chain from PEM (to also test PEM-parsing)
-    let contents = load_test_resource_file("github-com-chain.pem");
+    let contents = load_resource_file_as_string(env!("CARGO_MANIFEST_DIR"), "github-com-chain.pem");
     let mut chain = upkit_common_x509::encdec::pem::parse(&contents)
         .unwrap()
         .into_iter()
@@ -95,15 +88,7 @@ fn test_cert_path_real_world() {
 }
 
 fn load_b64_file(relative_path: &str) -> Vec<u8> {
-    let contents = load_test_resource_file(relative_path);
+    let contents = load_resource_file_as_string(env!("CARGO_MANIFEST_DIR"), relative_path);
     let bytes = tyst::encdec::base64::decode(&contents).unwrap();
     bytes
-}
-
-fn load_test_resource_file(relative_path: &str) -> String {
-    let mut file_path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    file_path.push("resources/test");
-    file_path.push(relative_path);
-    let full_filename = file_path.display().to_string();
-    std::fs::read_to_string(file_path).expect(&format!("Missing test data '{full_filename}'."))
 }

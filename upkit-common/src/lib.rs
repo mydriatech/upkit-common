@@ -19,4 +19,5 @@
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
 
+pub use upkit_common_util as util;
 pub use upkit_common_x509 as x509;

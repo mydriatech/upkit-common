@@ -15,20 +15,14 @@
     limitations under the License.
 */
 
+use upkit_common_util::testing::*;
 use upkit_common_x509::tsp::parse::TimeStampReqParser;
 use upkit_common_x509::tsp::parse::TimeStampRespParser;
 use upkit_common_x509::tsp::validate::TimeStampResponseValidator;
 
-pub fn init_logger() {
-    let _ = env_logger::builder()
-        .is_test(true)
-        .filter_level(log::LevelFilter::Debug)
-        .try_init();
-}
-
 #[test]
 fn test_time_stamp_request_parser() {
-    init_logger();
+    initialize_env_logger();
     let encoded_time_stamp_req = load_b64_file("tsp/http_tsa_baltstamp_lt-20250102.tsq.b64");
     let time_stamp_req = TimeStampReqParser::from_bytes(&encoded_time_stamp_req).unwrap();
     let expected_nonce = "3613593832132195395";
@@ -42,7 +36,7 @@ fn test_time_stamp_request_parser() {
 
 #[test]
 fn test_time_stamp_response_parser() {
-    init_logger();
+    initialize_env_logger();
     let encoded_time_stamp_resp = load_b64_file("tsp/http_tsa_baltstamp_lt-20250102.tsr.b64");
     let time_stamp_resp = TimeStampRespParser::from_bytes(&encoded_time_stamp_resp).unwrap();
     let expected_nonce = "3613593832132195395";
@@ -62,9 +56,11 @@ fn test_time_stamp_response_parser() {
 
 #[test]
 fn test_time_stamp_response_validation() {
-    init_logger();
-    //
-    let contents = load_test_resource_file("tsp/trust_anchor-globaltrust-2015.pem");
+    initialize_env_logger();
+    let contents = load_resource_file_as_string(
+        env!("CARGO_MANIFEST_DIR"),
+        "tsp/trust_anchor-globaltrust-2015.pem",
+    );
     let trust_anchor = upkit_common_x509::encdec::pem::parse(&contents)
         .unwrap()
         .into_iter()
@@ -88,15 +84,7 @@ fn test_time_stamp_response_validation() {
 }
 
 fn load_b64_file(relative_path: &str) -> Vec<u8> {
-    let contents = load_test_resource_file(relative_path);
+    let contents = load_resource_file_as_string(env!("CARGO_MANIFEST_DIR"), relative_path);
     let bytes = tyst::encdec::base64::decode(&contents).unwrap();
     bytes
-}
-
-fn load_test_resource_file(relative_path: &str) -> String {
-    let mut file_path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    file_path.push("resources/test");
-    file_path.push(relative_path);
-    let full_filename = file_path.display().to_string();
-    std::fs::read_to_string(file_path).expect(&format!("Missing test data '{full_filename}'."))
 }

@@ -14,6 +14,7 @@ license = "Apache-2.0 WITH AdditionRef-FWM-Exception-1.0.0"
 #all-features = true
 
 [dependencies]
+upkit_common_util = { path = "../upkit-common-util" }
 upkit_common_x509 = { path = "../upkit-common-x509" }
 
 #[dev-dependencies]

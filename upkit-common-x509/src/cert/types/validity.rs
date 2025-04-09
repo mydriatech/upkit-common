@@ -69,13 +69,8 @@ impl Validity {
     /// Backdating certificates are commonly used to allow immidiate use of
     /// certificate despite imperfections and clock skew in the real world.
     pub fn with_backdated_not_before_now(not_after: u64) -> Self {
-        let not_before = Self::now_epoch_seconds() - 10 * 60;
+        let not_before = upkit_common_util::time::now_epoch_seconds() - 10 * 60;
         Self::new(not_before, not_after)
-    }
-
-    /// Return "now" as number of seconds since 1970-01-01 00:00:00.
-    pub fn now_epoch_seconds() -> u64 {
-        u64::try_from(chrono::Utc::now().timestamp()).unwrap()
     }
 
     /// Return `not_before` as number of seconds since 1970-01-01 00:00:00.
