@@ -1,0 +1,23 @@
+[package]
+name = "upkit_common_util"
+version = "0.0.0"
+edition = "2021"
+description = "UPKIT common generic utilities"
+license = "Apache-2.0 WITH AdditionRef-FWM-Exception-1.0.0"
+publish = false
+
+#[[bench]]
+#name = "all"
+#harness = false
+
+#[package.metadata.docs.rs]
+#all-features = true
+
+[dependencies]
+# Logging and tracing
+log = { workspace = true, features = [] }
+env_logger = { workspace = true, features = [] }
+
+#[dev-dependencies]
+
+#[features]

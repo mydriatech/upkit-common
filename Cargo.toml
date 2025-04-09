@@ -5,6 +5,7 @@ resolver = "2"
 
 members = [
     "upkit-common",
+    "upkit-common-util",
     "upkit-common-x509",
 ]
 
