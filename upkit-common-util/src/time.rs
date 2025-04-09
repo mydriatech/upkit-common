@@ -27,3 +27,15 @@ pub fn now_epoch_seconds() -> u64 {
         .unwrap()
         .as_secs()
 }
+
+/// Return the number of microseconds that has elapsed since
+/// `1970-01-01 00:00:00 UTC` ignoring non-leap.
+pub fn now_epoch_micros() -> u64 {
+    u64::try_from(
+        std::time::SystemTime::now()
+            .duration_since(std::time::SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_micros(),
+    )
+    .unwrap()
+}
