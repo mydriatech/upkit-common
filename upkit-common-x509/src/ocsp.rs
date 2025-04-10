@@ -24,6 +24,12 @@
 //! * [RFC 5019](https://www.rfc-editor.org/rfc/rfc5019) The Lightweight OCSP Profile for High-Volume Environments
 
 mod ocsp_asn1;
+pub mod build {
+    //! OCSP request and response building.
+    mod ocsp_request;
+
+    pub use ocsp_request::*;
+}
 pub mod parse {
     //! OCSP request and response parsing.
     mod ocsp_parsing_error;
@@ -34,11 +40,15 @@ pub mod parse {
     pub use ocsp_request_parser::*;
     pub use ocsp_response_parser::*;
 }
-pub mod response_extensions {
+pub mod request_extensions {
     //! OCSP response extensions.
+    mod acceptable_responses;
     mod nonce;
+    mod pref_signature_algo;
 
+    pub use acceptable_responses::*;
     pub use nonce::*;
+    pub use pref_signature_algo::*;
 }
 pub mod types {
     //! OCSP request and response types.

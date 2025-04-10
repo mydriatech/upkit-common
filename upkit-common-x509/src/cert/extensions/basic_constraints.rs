@@ -84,8 +84,16 @@ impl BasicConstraints {
         }
     }
 
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(extension: rasn_pkix::Extension) -> Self {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            Self::OID,
+            &extension,
+        ))
+    }
+
     /// Return a Vec of new instances.
-    pub fn from_rasn_type(basic_constraints: &rasn_pkix::BasicConstraints) -> Self {
+    fn from_rasn_type(basic_constraints: &rasn_pkix::BasicConstraints) -> Self {
         Self {
             ca: basic_constraints.ca,
             path_len: basic_constraints

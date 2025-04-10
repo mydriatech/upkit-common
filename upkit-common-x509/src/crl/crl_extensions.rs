@@ -28,7 +28,6 @@ use crate::cert::extensions::CrlDistributionPoint;
 use crate::cert::types::WellKnownGeneralName;
 pub use crl_number::*;
 pub use issuing_distribution_point::*;
-use rasn::types::SequenceOf;
 
 /// CRL extensions.
 pub struct CrlExtensions {
@@ -46,11 +45,9 @@ impl CrlExtensions {
     /// Return the [AuthorityKeyIdentifier] `key_identifier` bytes if present.
     pub fn get_authority_key_identifier_kid(&self) -> Option<Vec<u8>> {
         crate::encdec::rasn::first_extension_by_oid(&self.extensions, AuthorityKeyIdentifier::OID)
-            .and_then(|extension| {
-                rasn::der::decode::<rasn_pkix::AuthorityKeyIdentifier>(&extension.extn_value).ok()
-            })
-            .and_then(|aki| aki.key_identifier)
-            .map(|encoded_aki| encoded_aki.to_vec())
+            .map(AuthorityKeyIdentifier::from_rasn_extension)
+            .as_ref()
+            .and_then(AuthorityKeyIdentifier::get_key_identifier)
     }
 
     /// Return the all [WellKnownGeneralName] if present.
@@ -59,23 +56,14 @@ impl CrlExtensions {
             &self.extensions,
             AlternativeName::OID_ISSUER_AN,
         )
-        .map(|extension| {
-            AlternativeName::from_rasn_type(
-                &rasn::der::decode::<SequenceOf<rasn_pkix::GeneralName>>(&extension.extn_value)
-                    .unwrap(),
-            )
-        })
+        .map(AlternativeName::from_rasn_extension)
         .unwrap_or_default()
     }
 
     /// Return the [CrlNumber] if present.
     pub fn get_crl_number(&self) -> Option<CrlNumber> {
         crate::encdec::rasn::first_extension_by_oid(&self.extensions, CrlNumber::OID_CRL_NUMBER)
-            .map(|extension| {
-                CrlNumber::from_rasn_type(
-                    &rasn::der::decode::<rasn::types::Integer>(&extension.extn_value).unwrap(),
-                )
-            })
+            .map(CrlNumber::from_rasn_extension)
     }
 
     /// Return the Delta CRL indicator base [CrlNumber] if present.
@@ -84,22 +72,14 @@ impl CrlExtensions {
             &self.extensions,
             CrlNumber::OID_DELTA_CRL_INDICATOR,
         )
-        .map(|extension| {
-            CrlNumber::from_rasn_type(
-                &rasn::der::decode::<rasn::types::Integer>(&extension.extn_value).unwrap(),
-            )
-        })
+        .map(CrlNumber::from_rasn_extension)
     }
 
     /// Return the [IssuingDistributionPoint] if present. Return an Err when present in an unsupported format.
     pub fn get_issuing_distribution_point(&self) -> Result<Option<String>, CrlParsingError> {
         crate::encdec::rasn::first_extension_by_oid(&self.extensions, IssuingDistributionPoint::OID)
-            .map(|extension| {
-                let idp =
-                    rasn::der::decode::<rasn_pkix::IssuingDistributionPoint>(&extension.extn_value)
-                        .unwrap();
-                IssuingDistributionPoint::from_rasn_type(&idp).map(Some)
-            })
+            .map(IssuingDistributionPoint::from_rasn_extension)
+            .map(|value| value.map(Some))
             .unwrap_or(Ok(None))
     }
 
@@ -109,14 +89,7 @@ impl CrlExtensions {
             &self.extensions,
             CrlDistributionPoint::OID_DELTA_CDP,
         )
-        .and_then(|extension| {
-            CrlDistributionPoint::from_rasn_type(
-                &rasn::der::decode::<SequenceOf<rasn_pkix::DistributionPoint>>(
-                    &extension.extn_value,
-                )
-                .unwrap(),
-            )
-        })
+        .and_then(CrlDistributionPoint::from_rasn_extension)
     }
 
     /// Return the `id-ad-caIssuers` [AuthorityInfoAccessDescription] if present.
@@ -125,20 +98,14 @@ impl CrlExtensions {
             &self.extensions,
             AuthorityInfoAccessDescription::OID,
         )
-        .and_then(|extension| {
-            let access_descriptions =
-                rasn::der::decode::<SequenceOf<rasn_pkix::AccessDescription>>(
-                    &extension.extn_value,
+        .map(AuthorityInfoAccessDescription::from_rasn_extension)
+        .and_then(|access_descriptions| {
+            access_descriptions.into_iter().find(|aiad| {
+                matches!(
+                    aiad,
+                    AuthorityInfoAccessDescription::CaIssuers { access_location: _ }
                 )
-                .unwrap();
-            AuthorityInfoAccessDescription::from_rasn_type(&access_descriptions)
-                .into_iter()
-                .find(|aiad| {
-                    matches!(
-                        aiad,
-                        AuthorityInfoAccessDescription::CaIssuers { access_location: _ }
-                    )
-                })
+            })
         })
     }
 }

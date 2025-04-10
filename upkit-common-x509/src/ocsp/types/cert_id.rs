@@ -40,6 +40,23 @@ pub struct CertId {
 }
 
 impl CertId {
+    /// Return a new instance.
+    ///
+    /// The `hash_algorithm` is the one that was used to create the hashes.
+    pub fn new(
+        hash_algorithm: &[u32],
+        issuer_name_hash: &[u8],
+        issuer_key_hash: &[u8],
+        serial_number: &SerialNumber,
+    ) -> Self {
+        Self {
+            hash_algorithm: hash_algorithm.to_vec(),
+            issuer_name_hash: issuer_name_hash.to_vec(),
+            issuer_key_hash: issuer_key_hash.to_vec(),
+            serial_number: serial_number.to_owned(),
+        }
+    }
+
     /// Return a new instance from the `rasn` ASN.1 library type.
     pub fn from_rasn_type(cert_id: &rasn_ocsp::CertId) -> Self {
         Self {
@@ -48,6 +65,16 @@ impl CertId {
             issuer_name_hash: cert_id.issuer_name_hash.to_vec(),
             issuer_key_hash: cert_id.issuer_key_hash.to_vec(),
             serial_number: SerialNumber::from_rasn_type(&cert_id.serial_number),
+        }
+    }
+
+    /// Return a new instance from the `rasn` ASN.1 library type.
+    pub fn to_rasn_type(&self) -> rasn_ocsp::CertId {
+        rasn_ocsp::CertId {
+            hash_algorithm: crate::encdec::rasn::oid_as_algorithm_identifier(&self.hash_algorithm),
+            issuer_name_hash: self.issuer_name_hash.to_owned().into(),
+            issuer_key_hash: self.issuer_key_hash.to_owned().into(),
+            serial_number: self.serial_number.to_rasn_type(),
         }
     }
 

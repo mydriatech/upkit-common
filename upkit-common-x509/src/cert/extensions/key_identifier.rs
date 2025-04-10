@@ -30,6 +30,11 @@ impl AuthorityKeyIdentifier {
     /// joint-iso-ccitt(2) ds(5) ce(29) subjectKeyIdentifier (35)
     pub const OID: &[u32] = &[2, 5, 29, 35];
 
+    /// Return the key identifier as bytes.
+    pub fn get_key_identifier(&self) -> Option<Vec<u8>> {
+        self.aki.key_identifier.as_ref().map(|ki| ki.to_vec())
+    }
+
     /// Make an exact byte copy of the issuers Subject Key Identifier.
     pub fn from_issuers_subject_key_identifier(issuer_subject_key_identifier: &[u8]) -> Self {
         Self {
@@ -56,6 +61,21 @@ impl AuthorityKeyIdentifier {
         }
     }
 
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(extension: rasn_pkix::Extension) -> Self {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            Self::OID,
+            &extension,
+        ))
+    }
+
+    /// Return a new instances from the matching extension.
+    fn from_rasn_type(authority_key_identifier: &rasn_pkix::AuthorityKeyIdentifier) -> Self {
+        Self {
+            aki: authority_key_identifier.to_owned(),
+        }
+    }
+
     /// Return an AKI where only the key identifier fields is populated.
     pub fn to_rasn_type(&self) -> &rasn_pkix::AuthorityKeyIdentifier {
         &self.aki
@@ -71,10 +91,30 @@ impl SubjectKeyIdentifier {
     /// joint-iso-ccitt(2) ds(5) ce(29) subjectKeyIdentifier (14)
     pub const OID: &[u32] = &[2, 5, 29, 14];
 
+    /// Return the key identifier as bytes.
+    pub fn get_key_identifier(&self) -> Vec<u8> {
+        self.ski.to_vec()
+    }
+
     /// Return a new instance
     pub fn from_public_key(public_key: &dyn PublicKey) -> Self {
         Self {
             ski: OctetString::from(Self::get_key_identifier_bytes(public_key)),
+        }
+    }
+
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(extension: rasn_pkix::Extension) -> Self {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            Self::OID,
+            &extension,
+        ))
+    }
+
+    /// Return a new instances from the matching extension.
+    fn from_rasn_type(subject_key_identifier: &rasn_pkix::SubjectKeyIdentifier) -> Self {
+        Self {
+            ski: subject_key_identifier.to_owned(),
         }
     }
 

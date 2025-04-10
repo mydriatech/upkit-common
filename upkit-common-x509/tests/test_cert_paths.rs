@@ -36,7 +36,7 @@ fn test_cert_path() {
     )
     .unwrap();
     // Hardcode a time where this should succeed
-    let at_epoch_seconds = 1739555555;
+    let at_epoch_seconds = 1744293333;
     log::info!("Test at_epoch_seconds: {at_epoch_seconds} (now is {now_epoch_seconds}).");
     CertificatePathValidator::new(vec![load_b64_file("h1_root_ca.b64")])
         .unwrap()

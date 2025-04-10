@@ -17,7 +17,8 @@
 
 //! OCSP Single Request.
 
-use super::CertId;
+use crate::cert::types::SerialNumber;
+use crate::ocsp::types::CertId;
 
 /** OCSP Single Request.
 
@@ -38,10 +39,37 @@ pub struct SingleRequest {
     req_cert: CertId,
 }
 impl SingleRequest {
+    /// Return a new instance.
+    ///
+    /// The `hash_algorithm` is the one that was used to create the hashes.
+    pub fn new(
+        hash_algorithm: &[u32],
+        issuer_name_hash: &[u8],
+        issuer_key_hash: &[u8],
+        serial_number: &SerialNumber,
+    ) -> Self {
+        Self {
+            req_cert: CertId::new(
+                hash_algorithm,
+                issuer_name_hash,
+                issuer_key_hash,
+                serial_number,
+            ),
+        }
+    }
+
     /// Return a new instance from the `rasn` ASN.1 library type.
     pub fn from_rasn_type(request: &rasn_ocsp::Request) -> Self {
         Self {
             req_cert: CertId::from_rasn_type(&request.req_cert),
+        }
+    }
+
+    /// Return a new instance from the `rasn` ASN.1 library type.
+    pub fn to_rasn_type(&self) -> rasn_ocsp::Request {
+        rasn_ocsp::Request {
+            req_cert: self.req_cert.to_rasn_type(),
+            single_request_extensions: None,
         }
     }
 

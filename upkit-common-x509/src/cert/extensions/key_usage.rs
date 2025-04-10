@@ -103,4 +103,22 @@ impl KeyUsage {
         }
         bv
     }
+
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(extension: rasn_pkix::Extension) -> Vec<KeyUsage> {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            Self::OID,
+            &extension,
+        ))
+    }
+
+    /// Return a Vec of new instances.
+    fn from_rasn_type(key_usage: &rasn_pkix::KeyUsage) -> Vec<KeyUsage> {
+        key_usage
+            .into_iter()
+            .enumerate()
+            .filter(|(_i, b)| **b)
+            .filter_map(|(i, _b)| KeyUsage::from_index(i))
+            .collect::<Vec<_>>()
+    }
 }

@@ -304,4 +304,20 @@ impl ExtendedKeyUsage {
             .map(ObjectIdentifier::new_unchecked)
             .collect::<Vec<_>>()
     }
+
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(extension: rasn_pkix::Extension) -> Vec<ExtendedKeyUsage> {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            Self::OID,
+            &extension,
+        ))
+    }
+
+    /// Return a new instances from the matching extension.
+    fn from_rasn_type(extended_key_usages: &rasn_pkix::ExtKeyUsageSyntax) -> Vec<ExtendedKeyUsage> {
+        extended_key_usages
+            .iter()
+            .map(|oid| ExtendedKeyUsage::from_oid(oid))
+            .collect()
+    }
 }

@@ -23,7 +23,7 @@ use tyst::Tyst;
 use crate::cert::types::SerialNumber;
 use crate::ocsp::parse::OcspParsingError;
 use crate::ocsp::parse::OcspParsingErrorKind;
-use crate::ocsp::response_extensions::Nonce;
+use crate::ocsp::request_extensions::Nonce;
 use crate::ocsp::types::OcspResponseStatus;
 use crate::ocsp::types::ResponderId;
 use crate::ocsp::types::SingleResponse;
@@ -250,9 +250,7 @@ impl OcspResponseParser {
     /// Return [Nonce] extension when present.
     pub fn get_nonce(&self) -> Option<Nonce> {
         self.get_first_response_extension_by_oid(Nonce::OID)
-            .map(|extension| rasn::der::decode::<rasn_ocsp::Nonce>(&extension.extn_value).unwrap())
-            .as_ref()
-            .map(Nonce::from_rasn_type)
+            .map(Nonce::from_rasn_extension)
     }
 
     /// Return `true` if the OCSP responder will respond with "revoked" (with

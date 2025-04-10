@@ -50,6 +50,16 @@ impl AlternativeName {
             .collect::<Vec<_>>()
     }
 
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(
+        extension: rasn_pkix::Extension,
+    ) -> Vec<(WellKnownGeneralName, String)> {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            &extension.extn_id,
+            &extension,
+        ))
+    }
+
     /// Return a Vec of new instances (ignoring any unknown GeneralName).
     pub fn from_rasn_type(
         general_names: &SequenceOf<GeneralName>,

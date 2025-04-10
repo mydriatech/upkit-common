@@ -70,8 +70,17 @@ impl IssuingDistributionPoint {
     /// joint-iso-itu-t(2) ds(5) certificateExtension(29) issuingDistributionPoint(28)
     pub const OID: &[u32] = &[2, 5, 29, 28];
 
+    /// Return extension in a form that is easy to process by the ASN.1 library `rasn`.
+    pub fn to_rasn_extension(distribution_point_uri: &str) -> rasn_pkix::Extension {
+        crate::encdec::rasn::to_rasn_extension(
+            Self::OID,
+            true,
+            &Self::to_rasn_type(distribution_point_uri),
+        )
+    }
+
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    pub fn to_rasn_type(distribution_point_uri: &str) -> rasn_pkix::IssuingDistributionPoint {
+    fn to_rasn_type(distribution_point_uri: &str) -> rasn_pkix::IssuingDistributionPoint {
         rasn_pkix::IssuingDistributionPoint {
             distribution_point: Some(rasn_pkix::DistributionPointName::FullName(
                 [WellKnownGeneralName::Uri.to_rasn_type(distribution_point_uri)].to_vec(),
@@ -82,6 +91,14 @@ impl IssuingDistributionPoint {
             indirect_crl: false,
             only_contains_attribute_certs: false,
         }
+    }
+
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(extension: rasn_pkix::Extension) -> Result<String, CrlParsingError> {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            Self::OID,
+            &extension,
+        ))
     }
 
     /// Return a new instance from the `rasn` ASN.1 library type.
