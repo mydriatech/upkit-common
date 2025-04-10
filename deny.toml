@@ -5,7 +5,7 @@ all-features = false
 no-default-features = false
 
 [output]
-feature-depth = 1
+feature-depth = 10
 
 [advisories]
 ignore = []
@@ -24,19 +24,21 @@ allow = [
     # 'AdditionRef-' requires SPDX v3
     #"Apache-2.0 WITH AdditionRef-FWM-Exception-1.0.0",
 ]
-confidence-threshold = 0.8
+confidence-threshold = 0.95
 exceptions = [
     #{ allow = ["BSD-3-Clause"], crate = "encoding_rs" },
     #{ allow = ["Unicode-DFS-2016"], crate = "unicode-ident" },
     #{ allow = ["OpenSSL"], crate = "ring" },
+    #{ allow = ["MPL-2.0"], crate = "webpki-roots" },
+    #{ allow = ["Zlib"], crate = "foldhash" },
 ]
 
-[[licenses.clarify]]
-crate = "ring"
-expression = "MIT AND ISC AND OpenSSL"
-license-files = [
-    { path = "LICENSE", hash = 0xbd0eed23 },
-]
+#[[licenses.clarify]]
+#crate = "ring"
+#expression = "MIT AND ISC AND OpenSSL"
+#license-files = [
+#    { path = "LICENSE", hash = 0xbd0eed23 },
+#]
 
 [bans]
 multiple-versions = "warn"

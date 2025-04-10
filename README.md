@@ -36,6 +36,7 @@ Pure Rust X.509 utility implementations free from
 
 * [`upkit-common/`](upkit-common/): Library entry point and aggregation of the
 other modules.
+* [`upkit-common-util/`](upkit-common-util/): Provides generic helper functions.
 
 
 ## Limitations

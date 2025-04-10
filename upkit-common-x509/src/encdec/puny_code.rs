@@ -32,7 +32,7 @@ pub fn encode(dns_name_utf8: &str) -> String {
         })
         .collect::<Vec<_>>()
         .join(".");
-    if log::log_enabled!(log::Level::Debug) {
+    if log::log_enabled!(log::Level::Debug) && !dns_name_punycode.eq(&dns_name_utf8) {
         log::debug!(
             "dns_name. input: {}, punycode: {}",
             &dns_name_utf8,
@@ -56,7 +56,7 @@ pub fn decode(dns_name_punycode: &str) -> String {
         })
         .collect::<Vec<_>>()
         .join(".");
-    if log::log_enabled!(log::Level::Debug) {
+    if log::log_enabled!(log::Level::Debug) && !dns_name_punycode.eq(&dns_name_utf8) {
         log::debug!(
             "dns_name. punycode: {}, output: {}",
             &dns_name_punycode,
