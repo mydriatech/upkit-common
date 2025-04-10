@@ -18,10 +18,11 @@
 //! OCSP request parsing.
 
 use crate::cert::types::WellKnownGeneralName;
-use crate::ocsp::ocsp_asn1 as asn1;
 use crate::ocsp::parse::OcspParsingError;
 use crate::ocsp::parse::OcspParsingErrorKind;
-use crate::ocsp::response_extensions::Nonce;
+use crate::ocsp::request_extensions::AcceptableResponses;
+use crate::ocsp::request_extensions::Nonce;
+use crate::ocsp::request_extensions::PreferredSignatureAlgorithms;
 use crate::ocsp::types::SingleRequest;
 
 /** OCSP Request parser.
@@ -142,71 +143,32 @@ impl OcspRequestParser {
             .and_then(|extensions| crate::encdec::rasn::first_extension_by_oid(extensions, oid))
     }
 
-    /// It is expected to only contain the `id-pkix-ocsp-basic` OID if present.
+    /// Return the type of response messages that are acceptable to the OCSP
+    /// client.
     ///
-    /// See also [RFC 6960 4.4.3](https://www.rfc-editor.org/rfc/rfc6960#section-4.4.3).
-    pub fn get_acceptable_response_types(&self) -> Vec<Vec<u32>> {
-        // https://www.rfc-editor.org/rfc/rfc6960#section-4.4.3
-        // iso(1) identified-organization(3) dod(6) internet(1) security(5) mechanisms(5) pkix(7) ad(48) id-ad-ocsp(1) id-pkix-ocsp-response(4)
-        const OID: &[u32] = &[1, 3, 6, 1, 5, 5, 7, 48, 1, 4];
-        self.get_first_request_extension_by_oid(OID)
-            .map(|extension| {
-                rasn::der::decode::<rasn::types::SequenceOf<rasn::types::ObjectIdentifier>>(
-                    &extension.extn_value,
-                )
-                .unwrap()
-                .iter()
-                .map(|oid| oid.to_vec())
-                .collect::<Vec<_>>()
-            })
+    /// It is expected to only contain the `id-pkix-ocsp-basic` OID when the
+    /// extension is present.
+    ///
+    /// See [AcceptableResponses] for details.
+    pub fn get_acceptable_response_types(&self) -> AcceptableResponses {
+        self.get_first_request_extension_by_oid(AcceptableResponses::OID)
+            .map(AcceptableResponses::from_rasn_extension)
             .unwrap_or_default()
     }
 
-    /// Preferred Signature Algorithms
+    /// Preferred Signature Algorithms by the OCSP client.
     ///
-    /// Defined in [RFC 6960 4.4.4.7](https://www.rfc-editor.org/rfc/rfc6960#section-4.4.7).
-    ///
-    /// See also [RFC 6960 4.3](https://www.rfc-editor.org/rfc/rfc6960#section-4.3) where legacy algorithm sha256WithRSAEncryption are SHALL, but modern algorithms are MAY..
-    pub fn get_preferred_signature_algorithms(
-        &self,
-    ) -> Vec<(String, Option<String>, Option<String>)> {
-        // iso(1) identified-organization(3) dod(6) internet(1) security(5) mechanisms(5) pkix(7) ad(48) id-ad-ocsp(1) id-pkix-ocsp-pref-sig-algs(8)
-        const OID: &[u32] = &[1, 3, 6, 1, 5, 5, 7, 48, 1, 8];
-        self.get_first_request_extension_by_oid(OID).map(|extension|{
-            rasn::der::decode::<asn1::PreferredSignatureAlgorithms>(&extension.extn_value).unwrap().iter().map(|psa|{
-                let signature_algorithm_oid = psa.sig_identifier
-                    .algorithm
-                    .iter()
-                    .map(|part| part.to_string())
-                    .collect::<Vec<_>>()
-                    .join(".")
-                    .to_owned();
-                // Example from RFC: algorithm=id-ecPublicKey and parameters= secp256r1.
-                // iso(1) member-body(2) us(840) ansi-x962(10045) keyType(2) ecPublicKey(1)
-                const OID_EC_PUBLIC_KEY: &[u32] = &[1, 2, 840, 10045, 2, 1];
-                let public_key_algorithm = None;
-                let public_key_params = None;
-                if let Some(capability) = &psa.pub_key_alg_identifier {
-                    match capability.capability_id.as_ref() {
-                        OID_EC_PUBLIC_KEY => {
-                            log::debug!("Preferred sig algorithm params for 'id-ecPublicKey' is not implemented yet.")
-                        }
-                        unknown => {
-                            log::debug!("Preferred sig algorithm params for '{unknown:?}' is not implemented yet.")
-                        }
-                    };
-                }
-                (signature_algorithm_oid, public_key_algorithm, public_key_params)
-            }).collect::<Vec<_>>()
-        }).unwrap_or_default()
+    /// See [PreferredSignatureAlgorithms] for details.
+    pub fn get_preferred_signature_algorithms(&self) -> PreferredSignatureAlgorithms {
+        self.get_first_request_extension_by_oid(PreferredSignatureAlgorithms::OID)
+            .map(PreferredSignatureAlgorithms::from_rasn_extension)
+            .unwrap_or_default()
     }
 
     /// Return the [Nonce] that the can be used to corrolate this request with a
     /// response later.
     pub fn get_nonce(&self) -> Option<Nonce> {
         self.get_first_request_extension_by_oid(Nonce::OID)
-            .map(|extension| rasn::der::decode::<rasn_ocsp::Nonce>(&extension.extn_value).unwrap())
-            .as_ref()
-            .map(Nonce::from_rasn_type)
+            .map(Nonce::from_rasn_extension)
     }
 }

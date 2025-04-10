@@ -45,7 +45,6 @@ mod parsing_error;
 
 pub use self::parsing_error::CertificateParsingError;
 pub use self::parsing_error::CertificateParsingErrorKind;
-use super::cert_asn1 as asn1;
 use super::extensions::AlternativeName;
 use super::extensions::AuthorityInfoAccessDescription;
 use super::extensions::AuthorityKeyIdentifier;
@@ -61,8 +60,6 @@ use super::types::DistinguishedName;
 use super::types::SerialNumber;
 use super::types::Validity;
 use super::types::WellKnownGeneralName;
-use rasn::types::ObjectIdentifier;
-use rasn::types::SequenceOf;
 
 /// Certificate parser.
 #[derive(Clone)]
@@ -202,96 +199,55 @@ impl CertificateParser {
     /// Return Basic Constraints (when present)
     pub fn get_basic_constraints(&self) -> Option<BasicConstraints> {
         self.first_extension_by_oid(BasicConstraints::OID)
-            .map(|extension| {
-                rasn::der::decode::<rasn_pkix::BasicConstraints>(&extension.extn_value).unwrap()
-            })
-            .as_ref()
-            .map(BasicConstraints::from_rasn_type)
+            .map(BasicConstraints::from_rasn_extension)
     }
 
     /// Returns one of the possible [KeyUsage]s.
     pub fn get_key_usage(&self) -> Option<Vec<KeyUsage>> {
-        self.first_extension_by_oid(KeyUsage::OID).map(|extension| {
-            let key_usage =
-                rasn::der::decode::<rasn_pkix::KeyUsage>(&extension.extn_value).unwrap();
-            key_usage
-                .into_iter()
-                .enumerate()
-                .filter(|(_i, b)| *b)
-                .filter_map(|(i, _b)| KeyUsage::from_index(i))
-                .collect::<Vec<_>>()
-        })
+        self.first_extension_by_oid(KeyUsage::OID)
+            .map(KeyUsage::from_rasn_extension)
     }
 
     /// Return the all [ExtendedKeyUsage]s if present.
     pub fn get_extended_key_usage(&self) -> Vec<ExtendedKeyUsage> {
         self.first_extension_by_oid(ExtendedKeyUsage::OID)
-            .map(|extension| {
-                rasn::der::decode::<SequenceOf<ObjectIdentifier>>(&extension.extn_value)
-                    .unwrap()
-                    .iter()
-                    .map(|oid| ExtendedKeyUsage::from_oid(oid))
-                    .collect()
-            })
+            .map(ExtendedKeyUsage::from_rasn_extension)
             .unwrap_or_default()
     }
 
     /// Return the [AuthorityKeyIdentifier] `key_identifier` bytes if present.
     pub fn get_authority_key_identifier_kid(&self) -> Option<Vec<u8>> {
         self.first_extension_by_oid(AuthorityKeyIdentifier::OID)
-            .and_then(|extension| {
-                rasn::der::decode::<rasn_pkix::AuthorityKeyIdentifier>(&extension.extn_value)
-                    .unwrap()
-                    .key_identifier
-                    .map(|kid| kid.to_vec())
-            })
+            .map(AuthorityKeyIdentifier::from_rasn_extension)
+            .as_ref()
+            .and_then(AuthorityKeyIdentifier::get_key_identifier)
     }
 
     /// Return the [SubjectKeyIdentifier] `key_identifier` bytes if present.
     pub fn get_subject_key_identifier_kid(&self) -> Option<Vec<u8>> {
         self.first_extension_by_oid(SubjectKeyIdentifier::OID)
-            .map(|extension| {
-                rasn::der::decode::<rasn_pkix::SubjectKeyIdentifier>(&extension.extn_value)
-                    .unwrap()
-                    .to_vec()
-            })
+            .map(SubjectKeyIdentifier::from_rasn_extension)
+            .as_ref()
+            .map(SubjectKeyIdentifier::get_key_identifier)
     }
 
     /// Return the all [CertificatePolicy] if present.
     pub fn get_certificate_policies(&self) -> Vec<CertificatePolicy> {
         self.first_extension_by_oid(CertificatePolicy::OID)
-            .map(|extension| {
-                let policies = rasn::der::decode::<SequenceOf<rasn_pkix::PolicyInformation>>(
-                    &extension.extn_value,
-                )
-                .unwrap();
-                CertificatePolicy::from_rasn_type(&policies)
-            })
+            .map(CertificatePolicy::from_rasn_extension)
             .unwrap_or_default()
     }
 
     /// Return a CA issued CDP URI for all revocation reasons if present. Preferr http over ldap.
     pub fn get_crl_distribution_point(&self) -> Option<String> {
         self.first_extension_by_oid(CrlDistributionPoint::OID)
-            .and_then(|extension| {
-                let cdps = rasn::der::decode::<SequenceOf<rasn_pkix::DistributionPoint>>(
-                    &extension.extn_value,
-                )
-                .unwrap();
-                CrlDistributionPoint::from_rasn_type(&cdps)
-            })
+            .and_then(CrlDistributionPoint::from_rasn_extension)
     }
 
     /// Return the all [AuthorityInfoAccessDescription] if present.
     pub fn get_authority_information_access(&self) -> Vec<AuthorityInfoAccessDescription> {
         self.first_extension_by_oid(AuthorityInfoAccessDescription::OID)
-            .map(|extension| {
-                let access_descriptions = rasn::der::decode::<
-                    SequenceOf<rasn_pkix::AccessDescription>,
-                >(&extension.extn_value)
-                .unwrap();
-                AuthorityInfoAccessDescription::from_rasn_type(&access_descriptions)
-            })
+            .map(AuthorityInfoAccessDescription::from_rasn_extension)
             .unwrap_or_default()
     }
 
@@ -307,12 +263,7 @@ impl CertificateParser {
 
     fn get_alternative_name(&self, oid: &[u32]) -> Vec<(WellKnownGeneralName, String)> {
         self.first_extension_by_oid(oid)
-            .map(|extension| {
-                let general_names =
-                    rasn::der::decode::<SequenceOf<rasn_pkix::GeneralName>>(&extension.extn_value)
-                        .unwrap();
-                AlternativeName::from_rasn_type(&general_names)
-            })
+            .map(AlternativeName::from_rasn_extension)
             .unwrap_or_default()
     }
 
@@ -326,10 +277,6 @@ impl CertificateParser {
     /// Return the [PrivateKeyUsagePeriod] if present.
     pub fn get_private_key_usage_period(&self) -> Option<PrivateKeyUsagePeriod> {
         self.first_extension_by_oid(PrivateKeyUsagePeriod::OID)
-            .map(|extension| {
-                let pkup = rasn::der::decode::<asn1::PrivateKeyUsagePeriod>(&extension.extn_value)
-                    .unwrap();
-                PrivateKeyUsagePeriod::from_rasn_type(&pkup)
-            })
+            .map(PrivateKeyUsagePeriod::from_rasn_extension)
     }
 }

@@ -106,8 +106,16 @@ impl PrivateKeyUsagePeriod {
         }
     }
 
-    /// Return a Vec of new instances.
-    pub fn from_rasn_type(private_key_usage_period: &asn1::PrivateKeyUsagePeriod) -> Self {
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(extension: rasn_pkix::Extension) -> Self {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            Self::OID,
+            &extension,
+        ))
+    }
+
+    /// Return a new instances.
+    fn from_rasn_type(private_key_usage_period: &asn1::PrivateKeyUsagePeriod) -> Self {
         Self {
             not_before_epoch_seconds: private_key_usage_period
                 .not_before

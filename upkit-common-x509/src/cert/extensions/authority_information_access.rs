@@ -118,6 +118,14 @@ impl AuthorityInfoAccessDescription {
             .collect()
     }
 
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(extension: rasn_pkix::Extension) -> Vec<Self> {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            &extension.extn_id,
+            &extension,
+        ))
+    }
+
     /// Return a Vec of new instances.
     pub fn from_rasn_type(accesss_descriptions: &SequenceOf<AccessDescription>) -> Vec<Self> {
         accesss_descriptions

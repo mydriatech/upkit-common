@@ -130,8 +130,16 @@ impl CertificatePolicy {
     const OID_QUALIFIER_ID_CPS: &[u32] = &[1, 3, 6, 1, 5, 5, 7, 2, 1];
     const OID_QUALIFIER_ID_UNOTICE: &[u32] = &[1, 3, 6, 1, 5, 5, 7, 2, 2];
 
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(extension: rasn_pkix::Extension) -> Vec<CertificatePolicy> {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            Self::OID,
+            &extension,
+        ))
+    }
+
     /// Return a Vec of new instances.
-    pub fn from_rasn_type(policies: &SequenceOf<PolicyInformation>) -> Vec<Self> {
+    fn from_rasn_type(policies: &SequenceOf<PolicyInformation>) -> Vec<Self> {
         policies.iter().map(Self::from_policy_information).collect()
     }
 

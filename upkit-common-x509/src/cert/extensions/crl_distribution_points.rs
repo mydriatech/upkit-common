@@ -45,6 +45,14 @@ impl CrlDistributionPoint {
     /// Freshest CRL (a.k.a. Delta CRL Distribution Point)
     pub const OID_DELTA_CDP: &[u32] = &[2, 5, 29, 46];
 
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(extension: rasn_pkix::Extension) -> Option<String> {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            &extension.extn_id,
+            &extension,
+        ))
+    }
+
     /// Return a CA issued CDP URI for all revocation reasons if present. Preferr http over ldap.
     pub fn from_rasn_type(cdps: &SequenceOf<DistributionPoint>) -> Option<String> {
         cdps.iter()

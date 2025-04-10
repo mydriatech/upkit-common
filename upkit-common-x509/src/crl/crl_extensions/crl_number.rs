@@ -94,16 +94,33 @@ impl CrlNumber {
         BigInt::from_bytes_be(num_bigint::Sign::Plus, &self.crl_number_hex)
     }
 
+    /// Return extension in a form that is easy to process by the ASN.1 library `rasn`.
+    pub fn to_rasn_extension(&self, delta_crl_indicator: bool) -> rasn_pkix::Extension {
+        let oid = if delta_crl_indicator {
+            Self::OID_DELTA_CRL_INDICATOR
+        } else {
+            Self::OID_CRL_NUMBER
+        };
+        crate::encdec::rasn::to_rasn_extension(oid, false, &self.to_rasn_type())
+    }
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    pub fn to_rasn_type(&self) -> rasn::types::Integer {
+    fn to_rasn_type(&self) -> rasn::types::Integer {
         rasn::types::Integer::from(BigInt::from_bytes_be(
             num_bigint::Sign::Plus,
             &self.crl_number_hex,
         ))
     }
 
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(extension: rasn_pkix::Extension) -> Self {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            &extension.extn_id,
+            &extension,
+        ))
+    }
+
     /// Return a new instance from the `rasn` ASN.1 library type.
-    pub fn from_rasn_type(crl_number: &rasn::types::Integer) -> Self {
+    fn from_rasn_type(crl_number: &rasn::types::Integer) -> Self {
         Self {
             crl_number_hex: crate::encdec::rasn::integer_as_bytes_be(crl_number),
         }

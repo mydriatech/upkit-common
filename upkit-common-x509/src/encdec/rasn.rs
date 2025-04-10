@@ -121,6 +121,32 @@ pub fn first_extension_by_oid(
         .cloned()
 }
 
+#[inline]
+pub fn debug_assert_extension_oid(extension: &rasn_pkix::Extension, oid: &[u32]) {
+    debug_assert!(
+        rasn::types::ObjectIdentifier::new_unchecked(oid.to_vec().into()).eq(&extension.extn_id),
+        "Wrong extension invoked. Expected OID {oid:?}. Actual OID: {}.",
+        &extension.extn_id
+    )
+}
+
+pub fn to_rasn_extension<T: rasn::Encode>(
+    oid: &[u32],
+    critical: bool,
+    value: &T,
+) -> rasn_pkix::Extension {
+    rasn_pkix::Extension {
+        extn_id: rasn::types::ObjectIdentifier::new_unchecked(oid.to_vec().into()),
+        critical,
+        extn_value: rasn::types::OctetString::from(rasn::der::encode(value).unwrap()),
+    }
+}
+
+pub fn from_rasn_extension<T: rasn::Decode>(oid: &[u32], extension: &rasn_pkix::Extension) -> T {
+    debug_assert_extension_oid(extension, oid);
+    rasn::der::decode::<T>(&extension.extn_value).unwrap()
+}
+
 /// Return the time in epoch seconds from the `rasn` ASN.1 library type.
 pub fn from_rasn_epoch_seconds(time: &rasn_pkix::Time) -> u64 {
     u64::try_from(match time {

@@ -79,13 +79,26 @@ impl Nonce {
         Self { nonce: rnd }
     }
 
+    /// Return extension in a form that is easy to process by the ASN.1 library `rasn`.
+    pub fn to_rasn_extension(&self) -> rasn_pkix::Extension {
+        crate::encdec::rasn::to_rasn_extension(Self::OID, false, &self.to_rasn_type())
+    }
+
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    pub fn to_rasn_type(&self) -> rasn_ocsp::Nonce {
+    fn to_rasn_type(&self) -> rasn_ocsp::Nonce {
         OctetString::from(self.nonce.to_vec())
     }
 
+    /// Return a new instances from the matching extension.
+    pub fn from_rasn_extension(extension: rasn_pkix::Extension) -> Self {
+        Self::from_rasn_type(&crate::encdec::rasn::from_rasn_extension(
+            Self::OID,
+            &extension,
+        ))
+    }
+
     /// Return a Vec of new instances.
-    pub fn from_rasn_type(nonce: &rasn_ocsp::Nonce) -> Self {
+    fn from_rasn_type(nonce: &rasn_ocsp::Nonce) -> Self {
         Self {
             nonce: nonce.to_vec(),
         }
