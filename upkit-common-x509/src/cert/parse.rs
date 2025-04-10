@@ -251,6 +251,20 @@ impl CertificateParser {
             .unwrap_or_default()
     }
 
+    /// Return the first OCSP URI from [AuthorityInfoAccessDescription] if such is present.
+    pub fn get_authority_information_access_ocsp_uri(&self) -> Option<String> {
+        self.get_authority_information_access()
+            .into_iter()
+            .filter_map(|aia| {
+                if let AuthorityInfoAccessDescription::Ocsp { uri } = aia {
+                    Some(uri)
+                } else {
+                    None
+                }
+            })
+            .next()
+    }
+
     /// Return the all [WellKnownGeneralName] if present.
     pub fn get_issuer_alternative_name(&self) -> Vec<(WellKnownGeneralName, String)> {
         self.get_alternative_name(AlternativeName::OID_ISSUER_AN)
