@@ -68,7 +68,7 @@ impl TimeStampToken {
     const OID_ID_CT_TST_INFO: &[u32] = &[1, 2, 840, 113549, 1, 9, 16, 1, 4];
 
     /// Create a new signed Time-Stamp.
-    pub fn new(mut tst_info: TstInfo, tst_signer: &TimeStampTokenSigner) -> Self {
+    pub fn new(mut tst_info: TstInfo, tst_signer: &TimeStampTokenSigner, cert_req: bool) -> Self {
         let digest_algo_oid = tst_signer.get_digest_algo_oid();
         let signing_cert = tst_signer.get_signing_certificate();
         if !signing_cert
@@ -78,7 +78,7 @@ impl TimeStampToken {
         {
             log::debug!("Signing certificate EKU does not explicitly declare that key can be used for Time-Stamping. Allowing this to proceed, but verification if this Time-Stamp might fail.");
         }
-        if tst_signer.is_bare() {
+        if !cert_req {
             // https://www.rfc-editor.org/rfc/rfc3628.html#section-7.3.1.h mandates that the signer is identifiable (country, device etc).
             // This implementation expects that the caller provides sufficient information about this in the TSA certificate.
             // If the TimeStampReq.certReq is false, we still provide the subject of this cert here.
@@ -130,8 +130,17 @@ impl TimeStampToken {
         };
         let mut version = 3isize;
         // https://www.rfc-editor.org/rfc/rfc5652#section-5.1
-        let certificates = tst_signer.get_certificate_choices();
+        let certificates = if cert_req {
+            Some(tst_signer.get_certificate_choices())
+        } else {
+            None
+        };
         let (crls, other_rev_type_present) = tst_signer.get_revocation_info_choices();
+        if cert_req {
+            tst_signer.get_revocation_info_choices()
+        } else {
+            (None, false)
+        };
         if other_rev_type_present {
             version = 5;
         }
