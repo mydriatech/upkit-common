@@ -22,6 +22,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
+use tyst::encdec::hex::ToHex;
 use tyst::Tyst;
 
 /** Certificate Serial Number
@@ -83,6 +84,16 @@ impl SerialNumber {
         Self {
             serial_number_hex: rnd,
         }
+    }
+
+    /// Return the serial number as big endian encoded bytes.
+    pub fn as_encoded_be(&self) -> &[u8] {
+        &self.serial_number_hex
+    }
+
+    /// Return the serial number as hex encoded big endian bytes.
+    pub fn to_hex(&self) -> String {
+        self.as_encoded_be().to_hex()
     }
 
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.

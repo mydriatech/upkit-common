@@ -64,6 +64,9 @@ Some random OtherNames that might be of interest:
     * KRB5PrincipalName 1.3.6.1.5.2.2
     * fascN=<FIPS 201-2 PIV FASC-N> 2.16.840.1.101.3.6.6
     * SmtpUTF8Mailbox https://datatracker.ietf.org/doc/html/rfc9598
+
+X.509 SPIFFE Verifiable Identity Document (SVID) relies on the standard
+uniformResourceIdentifier.
 */
 
 /// Well-known GeneralName types.
