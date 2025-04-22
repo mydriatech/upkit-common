@@ -80,11 +80,8 @@ impl CertificateOcspValidator {
     ) -> Result<(), CertificateValidationError> {
         // Validate that we have successful response
         if !OcspResponseStatus::Successful.eq(&ocsp_response.get_response_status()) {
-            Err(
-                CertificateValidationErrorKind::InvalidSignature.error_with_msg(
-                    "OCSP response signature could not be validated with issuer certificate.",
-                ),
-            )?
+            Err(CertificateValidationErrorKind::IncompleteData
+                .error_with_msg("OCSP response was unsuccessful."))?
         }
         // Is delegated OCSP signing in use? If, so validate path first..
         // If there are cert, ther should be exactly one OCSP signing cert and this should have been issued by the "issuer"

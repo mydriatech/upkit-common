@@ -39,7 +39,7 @@ chrono = { version = "0.4", default-features = false, features = ["alloc", "now"
 idna = { version = "1.0", default-features = true, features = [] }
 
 serde = { workspace = true, features = [] }
-#serde_json = { workspace = true, features = [] }
+serde_json = { workspace = true, features = [] }
 serde_with = { workspace = true, features = [] }
 
 # Converting simple enums to String

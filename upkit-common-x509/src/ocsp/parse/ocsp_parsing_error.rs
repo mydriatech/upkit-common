@@ -23,7 +23,7 @@ use std::fmt;
 /// Cause of parsing error.
 #[derive(Debug)]
 pub enum OcspParsingErrorKind {
-    /// Failure to parse the DER encoded Time-Stamp object.
+    /// Failure to parse the DER encoded OCSP object.
     DecodingError,
 }
 

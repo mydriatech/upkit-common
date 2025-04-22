@@ -354,9 +354,7 @@ impl WellKnownAttribute {
 
     /// Convert from a recognizable label
     pub fn by_oid(oid: &[u32]) -> Result<Self, IdentityFragmentError> {
-        let name = std::ops::Deref::deref(&INSTANCE_ATTRIBUTE_METADATA)
-            .by_oid(oid)
-            .unwrap();
+        let name = std::ops::Deref::deref(&INSTANCE_ATTRIBUTE_METADATA).by_oid(oid)?;
         Self::by_name(&name)
     }
 
@@ -373,7 +371,7 @@ impl WellKnownAttribute {
             .by_name(name)
             .ok_or(
                 IdentityFragmentErrorKind::UnknownAttribute
-                    .error_with_msg(&format!("'{name}' is not a known attribute.")),
+                    .error_with_msg(&format!("'{name}' is not a known/supported attribute.")),
             )
     }
 

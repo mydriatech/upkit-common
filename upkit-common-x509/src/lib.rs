@@ -25,6 +25,7 @@ pub mod crl;
 pub mod encdec;
 mod named_enum;
 pub mod ocsp;
+pub mod pkcs10;
 pub mod tsp;
 
 use tyst::{encdec::hex::ToHex, Tyst};
