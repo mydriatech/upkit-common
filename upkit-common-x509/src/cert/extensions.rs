@@ -62,6 +62,13 @@ pub struct Extensions {
 }
 
 impl Extensions {
+    /// Return a new instance from the ASN.1 library `rasn` type.
+    pub fn from_rasn_type(extensions: &rasn_pkix::Extensions) -> Self {
+        Self {
+            extensions: extensions.as_slice().to_vec(),
+        }
+    }
+
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
     pub fn to_rasn_type(&self) -> Option<rasn_pkix::Extensions> {
         if self.extensions.is_empty() {

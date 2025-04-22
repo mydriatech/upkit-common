@@ -147,7 +147,11 @@ impl DistinguishedName {
                 .map(|rdn| {
                     rdn.to_vec()
                         .into_iter()
-                        .map(|atav| WellKnownAttribute::from_rasn_type(atav).unwrap())
+                        .filter_map(|atav| {
+                            WellKnownAttribute::from_rasn_type(atav)
+                                .map_err(|e| log::warn!("Ignoring unknown attribute: {e:?}"))
+                                .ok()
+                        })
                         .collect()
                 })
                 .collect(),
