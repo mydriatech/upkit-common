@@ -20,6 +20,7 @@
 #![doc = include_str!("../README.md")]
 
 pub mod cert;
+pub mod cmp;
 pub mod cms;
 pub mod crl;
 pub mod encdec;
