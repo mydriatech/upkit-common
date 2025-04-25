@@ -42,4 +42,6 @@ pub mod types {
     pub use pkcs10_attributes::*;
 }
 
-mod pkcs10_asn1;
+pub(crate) mod pkcs10_asn1;
+
+pub(crate) use pkcs10_asn1 as asn1;

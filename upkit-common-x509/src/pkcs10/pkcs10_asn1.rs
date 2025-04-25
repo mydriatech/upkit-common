@@ -17,7 +17,7 @@
 
 //! ASN.1 module for [RFC 2986](https://www.rfc-editor.org/rfc/rfc2986).
 
-// TODO: Re-license and contribute this upstream to `rasn`.
+// TODO: Re-license and contribute this upstream to `rasn`?
 
 use rasn::prelude::*;
 use rasn::{AsnType, Decode, Encode};
