@@ -123,6 +123,8 @@ pub struct PkiStatusInfo {
       revocationNotification (5)
        -- notification that a revocation has occurred  }
 ```
+
+NOTE: This also exists in CMP (RFC 4210), where "granted" is named "accepted".
 */
 pub type PkiStatus = u64;
 
@@ -134,6 +136,8 @@ pub type PkiStatus = u64;
        -- include an RFC 1766 language tag to indicate the language
        -- of the contained text)
 ```
+
+NOTE: This also exists in CMP (RFC 4210).
 */
 pub type PkiFreeText = SequenceOf<Utf8String>;
 
@@ -159,6 +163,8 @@ pub type PkiFreeText = SequenceOf<Utf8String>;
        systemFailure       (25)
          -- the request cannot be handled due to system failure  }
 ```
+
+NOTE: This also exists in CMP (RFC 4210).
 */
 pub type PkiFailureInfo = BitString;
 

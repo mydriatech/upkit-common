@@ -39,3 +39,35 @@ pub(crate) mod cmp_asn1;
 
 #[allow(unused_imports)]
 pub(crate) use cmp_asn1 as asn1;
+
+pub mod build {
+    //! Certificate Management Protocol (CMP) builders.
+
+    mod pki_message;
+
+    pub use self::pki_message::*;
+}
+
+pub mod error {
+    //! Certificate Management Protocol (CMP) processing errors.
+
+    mod cmp_processing_error;
+
+    pub use self::cmp_processing_error::*;
+}
+
+pub mod types {
+    //! Certificate Management Protocol (CMP) types.
+
+    mod error_msg_content;
+    mod initialization_request;
+    mod initialization_response;
+    mod pki_body;
+    mod pki_status;
+
+    pub use self::error_msg_content::*;
+    pub use self::initialization_request::*;
+    pub use self::initialization_response::*;
+    pub use self::pki_body::*;
+    pub use self::pki_status::*;
+}
