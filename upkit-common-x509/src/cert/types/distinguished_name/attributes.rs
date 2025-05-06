@@ -47,6 +47,7 @@ impl AttributeLookup {
         for (name, atavi) in WellKnownAttribute::attributes_common()
             .into_iter()
             .chain(WellKnownAttribute::attributes_extended_validation())
+            .chain(WellKnownAttribute::attributes_legacy_and_discouraged())
         {
             name_by_oid.insert(atavi.oid.to_vec(), name.to_owned());
             atavi_by_name.insert(name, atavi);
@@ -238,6 +239,13 @@ pub enum WellKnownAttribute {
     ///
     /// Implementation of RFC5280 MUST tolerate certs with this attribute.
     CommonName,
+    /// Legacy case-insensitive attribute that should not be used, but still can
+    /// be found in the real world.
+    ///
+    /// [RFC 1274 9.3.1](https://datatracker.ietf.org/doc/html/rfc1274#section-9.3.1):
+    ///
+    /// "The Userid attribute type specifies a computer system login name."
+    UserId,
     /*
     /// Qualifier to avoid collision in directory services.
     ///
@@ -617,6 +625,20 @@ impl WellKnownAttribute {
                     oid: &[2, 5, 4, 3],
                     encoding: Asn1EncodingType::Utf8String,
                     max_char_len: 64,
+                },
+            ),
+        ]
+    }
+
+    fn attributes_legacy_and_discouraged() -> Vec<(String, AttributeTypeAndValueInfo)> {
+        vec![
+            // X.520
+            (
+                Self::UserId.as_name(),
+                AttributeTypeAndValueInfo {
+                    oid: &[0, 9, 2342, 19200300, 100, 1, 1],
+                    encoding: Asn1EncodingType::Utf8String,
+                    max_char_len: 256,
                 },
             ),
         ]

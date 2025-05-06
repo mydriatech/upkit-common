@@ -1,10 +1,11 @@
 [package]
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+publish = { workspace = true }
 name = "upkit_common_x509"
-version = "0.0.0"
-edition = "2021"
 description = "UPKIT common X509 utilities"
-license = "Apache-2.0 WITH AdditionRef-FWM-Exception-1.0.0"
-publish = false
 
 #[[bench]]
 #name = "all"
@@ -16,7 +17,7 @@ publish = false
 [dependencies]
 upkit_common_util = { path = "../upkit-common-util" }
 
-tyst = { workspace = true, features = [] }
+tyst = { workspace = true, default-features = true, features = [] }
 
 # Logging and tracing
 log = { workspace = true, features = [] }

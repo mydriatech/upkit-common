@@ -214,7 +214,7 @@ impl CertificatePathValidator {
     }
 
     /// Return an ordered chain with leaf certificate first from bag of certs.
-    fn get_ordered_chain_from_bag_of_certs(
+    pub fn get_ordered_chain_from_bag_of_certs(
         certificates: &[CertificateParser],
     ) -> Result<Vec<CertificateParser>, CertificateValidationError> {
         let mut certificates = certificates.to_vec();

@@ -9,6 +9,13 @@ members = [
     "upkit-common-x509",
 ]
 
+[workspace.package]
+edition = "2021"
+license = "Apache-2.0 WITH AdditionRef-FWM-Exception-1.0.0"
+version = "0.0.0"
+repository = "https://github.com/mydriatech/upkit-common.git"
+publish = false
+
 #[profile.dev]
 #opt-level = 1
 #lto = "thin"

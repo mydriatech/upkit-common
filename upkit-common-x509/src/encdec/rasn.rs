@@ -95,8 +95,12 @@ pub fn integer_as_bytes_be(value: &rasn::types::Integer) -> Vec<u8> {
 pub fn oid_as_algorithm_identifier(oid: &[u32]) -> AlgorithmIdentifier {
     AlgorithmIdentifier {
         algorithm: ObjectIdentifier::new_unchecked(oid.to_vec().into()),
-        parameters: Some(Any::new(rasn::der::encode(&()).unwrap())),
+        parameters: Some(null()),
     }
+}
+
+pub fn null() -> Any {
+    Any::new(rasn::der::encode(&()).unwrap())
 }
 
 /// Return Object Identifier without parameters from the provided
