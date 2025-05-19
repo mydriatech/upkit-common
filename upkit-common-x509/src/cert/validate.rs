@@ -27,8 +27,8 @@ use super::extensions::BasicConstraints;
 use crate::cert::parse::CertificateParser;
 use crossbeam_skiplist::SkipSet;
 use std::sync::Arc;
-use tyst::traits::se::ToPublicKey;
 use tyst::Tyst;
+use tyst::traits::se::ToPublicKey;
 
 /** Certificate path validation.
 
@@ -286,7 +286,11 @@ impl CertificatePathValidator {
             //log::debug!("current.signature.oid: {oid}");
             if let Some(mut se) = Tyst::instance().ses().by_oid(&oid) {
                 if !se.verify(public_key.as_ref(), &signature, &tbs_certificate) {
-                    let mut msg = format!("Unable to verify signature of cert with fp '{}' using issuer cert fp '{}'.", current.fingerprint(), current_issuer.fingerprint());
+                    let mut msg = format!(
+                        "Unable to verify signature of cert with fp '{}' using issuer cert fp '{}'.",
+                        current.fingerprint(),
+                        current_issuer.fingerprint()
+                    );
                     // Help out with troubleshooting: Is it self-signed??
                     let spki = current.get_encoded_subject_public_key_info();
                     let public_key = spki.to_public_key();

@@ -28,9 +28,9 @@ use bitvec::order::Msb0;
 use bitvec::vec::BitVec;
 use rasn::types::ObjectIdentifier;
 use rasn::types::OctetString;
+use tyst::Tyst;
 use tyst::misc::Pbkdf2;
 use tyst::misc::Pbmac1;
-use tyst::Tyst;
 
 /** A generic CMP messages.
 

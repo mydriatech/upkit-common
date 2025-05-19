@@ -64,13 +64,15 @@ impl OcspRequest {
             tbs_request: rasn_ocsp::TbsRequest {
                 version: 1.into(),
                 requestor_name: None,
-                request_list: vec![SingleRequest::new(
-                    digest_algorithm_oid,
-                    &issuer_name_hash,
-                    &issuer_key_hash,
-                    &serial_number,
-                )
-                .to_rasn_type()],
+                request_list: vec![
+                    SingleRequest::new(
+                        digest_algorithm_oid,
+                        &issuer_name_hash,
+                        &issuer_key_hash,
+                        &serial_number,
+                    )
+                    .to_rasn_type(),
+                ],
                 request_extensions,
             },
             optional_signature: None,

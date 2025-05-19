@@ -15,8 +15,8 @@
     limitations under the License.
 */
 
-use tyst::traits::se::ToPublicKey;
 use tyst::Tyst;
+use tyst::traits::se::ToPublicKey;
 use upkit_common_util::testing::*;
 use upkit_common_x509::cert::parse::CertificateParser;
 use upkit_common_x509::cert::parse::CertificateParsingError;

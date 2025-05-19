@@ -32,9 +32,9 @@ use rasn_cms::IssuerAndSerialNumber;
 use rasn_cms::SignedData;
 use rasn_cms::SignerIdentifier;
 use rasn_cms::SignerInfo;
+use tyst::Tyst;
 use tyst::encdec::hex::ToHex;
 use tyst::traits::se::ToPublicKey;
-use tyst::Tyst;
 
 /** RFC3161 TimeStampToken.
 
@@ -75,7 +75,9 @@ impl TimeStampToken {
             .contains(&ExtendedKeyUsage::PkixTimeStamping)
             && log::log_enabled!(log::Level::Debug)
         {
-            log::debug!("Signing certificate EKU does not explicitly declare that key can be used for Time-Stamping. Allowing this to proceed, but verification if this Time-Stamp might fail.");
+            log::debug!(
+                "Signing certificate EKU does not explicitly declare that key can be used for Time-Stamping. Allowing this to proceed, but verification if this Time-Stamp might fail."
+            );
         }
         if !cert_req {
             // https://www.rfc-editor.org/rfc/rfc3628.html#section-7.3.1.h mandates that the signer is identifiable (country, device etc).
@@ -228,13 +230,17 @@ impl TimeStampToken {
         attribute.
         */
         if signer_infos.len() != 1 {
-            log::debug!("The time-stamp token MUST NOT contain any signatures other than the signature of the TSA.");
+            log::debug!(
+                "The time-stamp token MUST NOT contain any signatures other than the signature of the TSA."
+            );
             return false;
         }
 
         let signer_info = signer_infos.first().unwrap();
         if !signer_info.digest_algorithm.eq(digest_algo) {
-            log::debug!("Wrong digest algorithm used by signed. (Only single signer support is implemented.)");
+            log::debug!(
+                "Wrong digest algorithm used by signed. (Only single signer support is implemented.)"
+            );
             return false;
         }
         let signed_attributes = SignedAttributes::from_rasn_type(&signer_info.signed_attrs);

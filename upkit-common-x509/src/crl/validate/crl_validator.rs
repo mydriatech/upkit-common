@@ -21,8 +21,8 @@ use crate::cert::parse::CertificateParser;
 use crate::cert::validate::{CertificateValidationError, CertificateValidationErrorKind};
 use crate::crl::crl_entry_extensions::ReasonCode;
 use crate::crl::parse::CrlParser;
-use tyst::traits::se::ToPublicKey;
 use tyst::Tyst;
+use tyst::traits::se::ToPublicKey;
 
 /** Certificate CRL validator.
 

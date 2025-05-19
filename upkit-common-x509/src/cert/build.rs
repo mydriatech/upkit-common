@@ -148,7 +148,9 @@ impl NoSignatureTbsCertificate {
     /// Return a new instance from the `rasn` ASN.1 library type.
     pub fn from_rasn_type(tbs_certificate: &TbsCertificate) -> Self {
         if !Self::no_signature_algorithm_identifier().eq(&tbs_certificate.signature) {
-            log::debug!("Provided TBSCertificate did not use 'id-alg-noSignature' as signature algorithm. Allowing this to proceed anyway.");
+            log::debug!(
+                "Provided TBSCertificate did not use 'id-alg-noSignature' as signature algorithm. Allowing this to proceed anyway."
+            );
         }
         Self {
             tbs_certificate_b64: rasn::der::encode(tbs_certificate).unwrap(),

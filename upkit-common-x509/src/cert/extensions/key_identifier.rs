@@ -18,8 +18,8 @@
 //! X.509 Certificate AuthorityKeyIdentifier and SubjectKeyIdentifier.
 
 use rasn::types::OctetString;
-use tyst::traits::se::PublicKey;
 use tyst::Tyst;
+use tyst::traits::se::PublicKey;
 
 /// Authority Key Identifier as defined in [RFC5280 4.2.1.1](https://www.rfc-editor.org/rfc/rfc5280#section-4.2.1.1).
 pub struct AuthorityKeyIdentifier {

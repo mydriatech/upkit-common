@@ -23,9 +23,9 @@ use crate::cmp::asn1;
 use crate::cmp::error::CmpProcessingError;
 use crate::cmp::error::CmpProcessingErrorKind;
 use rasn::types::BitString;
+use tyst::Tyst;
 use tyst::traits::se::PrivateKey;
 use tyst::traits::se::PublicKey;
-use tyst::Tyst;
 
 /// Single certificate initialization request.
 pub struct InitializationRequest {

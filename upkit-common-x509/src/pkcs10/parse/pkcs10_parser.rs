@@ -17,8 +17,8 @@
 
 //! PKCS#10 Certification request parsing.
 
-use tyst::traits::se::ToPublicKey;
 use tyst::Tyst;
+use tyst::traits::se::ToPublicKey;
 
 use super::CertificationRequestParsingError;
 use super::CertificationRequestParsingErrorKind;

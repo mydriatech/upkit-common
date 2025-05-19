@@ -22,8 +22,8 @@ use serde::Deserialize;
 use serde::Serialize;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
-use tyst::encdec::hex::ToHex;
 use tyst::Tyst;
+use tyst::encdec::hex::ToHex;
 
 /** Certificate Serial Number
 
