@@ -17,9 +17,9 @@
 
 //! Time stamping response and failure codes.
 
-use crate::tsp::tsp_asn1 as asn1;
 use bitvec::vec::BitVec;
 use rasn::types::BitString;
+use rasn::types::Enumerated;
 
 /** Time stamping PKIStatus response code.
 
@@ -219,7 +219,7 @@ PKIStatusInfo ::= SEQUENCE {
 ```
 */
 pub struct PkiStatusInfo {
-    pki_status_info: asn1::PkiStatusInfo,
+    pki_status_info: rasn_cms::tsp::PkiStatusInfo,
 }
 
 impl PkiStatusInfo {
@@ -235,8 +235,11 @@ impl PkiStatusInfo {
             status_string.to_vec().into()
         };
         Self {
-            pki_status_info: asn1::PkiStatusInfo {
-                status: pki_status.as_value(),
+            pki_status_info: rasn_cms::tsp::PkiStatusInfo {
+                status: rasn_cms::tsp::PkiStatus::from_discriminant(
+                    isize::try_from(pki_status.as_value()).unwrap(),
+                )
+                .unwrap(),
                 status_string,
                 fail_info: fail_info.as_ref().map(PkiFailureInfo::as_value),
             },
@@ -244,7 +247,7 @@ impl PkiStatusInfo {
     }
 
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    pub fn to_rasn_type(self) -> asn1::PkiStatusInfo {
+    pub fn to_rasn_type(self) -> rasn_cms::tsp::PkiStatusInfo {
         self.pki_status_info
     }
 }

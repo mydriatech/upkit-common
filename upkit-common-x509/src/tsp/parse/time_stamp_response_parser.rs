@@ -17,9 +17,10 @@
 
 //! Time-Stamp response parsing.
 
+use rasn::types::Enumerated;
+
 pub use crate::tsp::parse::TimeStampParsingError;
 pub use crate::tsp::parse::TimeStampParsingErrorKind;
-use crate::tsp::tsp_asn1 as asn1;
 pub use crate::tsp::types::PkiFailureInfo;
 pub use crate::tsp::types::PkiStatus;
 pub use crate::tsp::types::TimeStampToken;
@@ -36,12 +37,12 @@ pub use crate::tsp::types::TimeStampToken;
 */
 #[derive(Clone)]
 pub struct TimeStampRespParser {
-    time_stamp_resp: asn1::TimeStampResp,
+    time_stamp_resp: rasn_cms::tsp::TimeStampResp,
 }
 impl TimeStampRespParser {
     /// Create a new instance from `encoded_time_stamp_resp` bytes.
     pub fn from_bytes(encoded_time_stamp_resp: &[u8]) -> Result<Self, TimeStampParsingError> {
-        rasn::der::decode::<asn1::TimeStampResp>(encoded_time_stamp_resp)
+        rasn::der::decode::<rasn_cms::tsp::TimeStampResp>(encoded_time_stamp_resp)
             .map_err(|e| {
                 let msg = format!(
                     "Error while decoding data. kind: '{:?}', codec: '{:?}'",
@@ -54,7 +55,10 @@ impl TimeStampRespParser {
 
     /// Return the overall success or failure status of the requested operation.
     pub fn get_status(&self) -> PkiStatus {
-        PkiStatus::from_value(self.time_stamp_resp.status.status).unwrap()
+        PkiStatus::from_value(
+            u64::try_from(self.time_stamp_resp.status.status.discriminant()).unwrap(),
+        )
+        .unwrap()
     }
 
     /// Return detailed failure status of the requested operation.

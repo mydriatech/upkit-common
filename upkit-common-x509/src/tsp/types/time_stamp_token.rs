@@ -22,7 +22,6 @@ use crate::cert::extensions::ExtendedKeyUsage;
 use crate::cert::parse::CertificateParser;
 use crate::cms::types::SignedAttributes;
 use crate::tsp::build::TimeStampTokenSigner;
-use crate::tsp::tsp_asn1 as asn1;
 use rasn::types::Any;
 use rasn::types::ObjectIdentifier;
 use rasn::types::OctetString;
@@ -363,7 +362,7 @@ impl TimeStampToken {
     }
 
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    pub fn from_rasn_type(time_stamp_token: &asn1::TimeStampToken) -> Option<Self> {
+    pub fn from_rasn_type(time_stamp_token: &rasn_cms::tsp::TimeStampToken) -> Option<Self> {
         if Self::is_signed_data(time_stamp_token) {
             Some(Self {
                 time_stamp_token_content: rasn::der::decode::<SignedData>(
@@ -377,7 +376,7 @@ impl TimeStampToken {
     }
 
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    pub fn to_rasn_type(&self) -> asn1::TimeStampToken {
+    pub fn to_rasn_type(&self) -> rasn_cms::tsp::TimeStampToken {
         rasn_cms::ContentInfo {
             content_type: rasn_cms::CONTENT_SIGNED_DATA.into(),
             content: Any::new(rasn::der::encode(&self.time_stamp_token_content).unwrap()),

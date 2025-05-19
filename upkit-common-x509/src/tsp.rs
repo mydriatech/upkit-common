@@ -47,7 +47,6 @@ pub mod parse {
     pub use self::time_stamp_response_parser::*;
     pub use self::ts_parsing_error::*;
 }
-mod tsp_asn1;
 pub mod types {
     //! X.509 Time-Stamp Protocol (TSP) types.
     mod pki_status;

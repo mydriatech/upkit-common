@@ -17,7 +17,6 @@
 
 //! Time-Stamp response builder.
 
-use crate::tsp::tsp_asn1 as asn1;
 use crate::tsp::types::PkiFailureInfo;
 use crate::tsp::types::PkiStatus;
 use crate::tsp::types::PkiStatusInfo;
@@ -38,7 +37,7 @@ impl TimeStampResp {
             PkiStatusInfo::new(&PkiStatus::Granted, &[], &None)
         };
         Self {
-            time_stamp_resp: rasn::der::encode(&asn1::TimeStampResp {
+            time_stamp_resp: rasn::der::encode(&rasn_cms::tsp::TimeStampResp {
                 status: status.to_rasn_type(),
                 time_stamp_token: Some(time_stamp_token.to_rasn_type()),
             })
@@ -52,7 +51,7 @@ impl TimeStampResp {
         // When the TimeStampToken is not present, the failInfo indicates the reason why the time-stamp request was rejected and may be one of the following values.
         // "one" → interpret this as only a single reason will be used
         Self {
-            time_stamp_resp: rasn::der::encode(&asn1::TimeStampResp {
+            time_stamp_resp: rasn::der::encode(&rasn_cms::tsp::TimeStampResp {
                 status: PkiStatusInfo::new(&PkiStatus::Rejection, status_string, fail_info)
                     .to_rasn_type(),
                 time_stamp_token: None,
@@ -73,7 +72,7 @@ impl TimeStampResp {
             bad_status => panic!("Invalid status at this point: {}", bad_status.as_value()),
         };
         Self {
-            time_stamp_resp: rasn::der::encode(&asn1::TimeStampResp {
+            time_stamp_resp: rasn::der::encode(&rasn_cms::tsp::TimeStampResp {
                 status: PkiStatusInfo::new(pki_status, status_string, &None).to_rasn_type(),
                 time_stamp_token: None,
             })
@@ -82,7 +81,7 @@ impl TimeStampResp {
     }
 
     /// Return a new instance from the `rasn` ASN.1 library type.
-    pub fn from_rasn_type(time_stamp_resp: &asn1::TimeStampResp) -> Self {
+    pub fn from_rasn_type(time_stamp_resp: &rasn_cms::tsp::TimeStampResp) -> Self {
         /*
         if !Self::no_signature_algorithm_identifier().eq(&tbs_certificate.signature) {
             log::debug!("Provided TBSCertificate did not use 'id-alg-noSignature' as signature algorithm. Allowing this to proceed anyway.");
@@ -99,7 +98,7 @@ impl TimeStampResp {
     }
 
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    pub fn to_rasn_type(&self) -> asn1::TimeStampResp {
+    pub fn to_rasn_type(&self) -> rasn_cms::tsp::TimeStampResp {
         rasn::der::decode(&self.time_stamp_resp).unwrap()
     }
 }

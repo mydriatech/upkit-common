@@ -19,7 +19,6 @@
 
 pub use crate::tsp::parse::TimeStampParsingError;
 pub use crate::tsp::parse::TimeStampParsingErrorKind;
-use crate::tsp::tsp_asn1 as asn1;
 pub use crate::tsp::types::PkiFailureInfo;
 pub use crate::tsp::types::PkiStatus;
 pub use crate::tsp::types::TimeStampToken;
@@ -49,12 +48,12 @@ use rasn::types::Integer;
 */
 #[derive(Clone)]
 pub struct TimeStampReqParser {
-    time_stamp_req: asn1::TimeStampReq,
+    time_stamp_req: rasn_cms::tsp::TimeStampReq,
 }
 impl TimeStampReqParser {
     /// Create a new instance from `encoded_time_stamp_req` bytes.
     pub fn from_bytes(encoded_time_stamp_req: &[u8]) -> Result<Self, TimeStampParsingError> {
-        rasn::der::decode::<asn1::TimeStampReq>(encoded_time_stamp_req)
+        rasn::der::decode::<rasn_cms::tsp::TimeStampReq>(encoded_time_stamp_req)
             .map_err(|e| {
                 let msg = format!(
                     "Error while decoding data. kind: '{:?}', codec: '{:?}'",
@@ -66,7 +65,7 @@ impl TimeStampReqParser {
     }
 
     /// Hash of the time-stamped data and the used message digest algorithm.
-    pub fn get_message_imprint(&self) -> &asn1::MessageImprint {
+    pub fn get_message_imprint(&self) -> &rasn_cms::tsp::MessageImprint {
         &self.time_stamp_req.message_imprint
     }
 

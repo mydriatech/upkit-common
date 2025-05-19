@@ -17,7 +17,6 @@
 
 //! X.509 Certificate Private Key Usage Period.
 
-use crate::cert::cert_asn1 as asn1;
 use serde::Deserialize;
 use serde::Serialize;
 use serde_with::serde_as;
@@ -95,8 +94,8 @@ impl PrivateKeyUsagePeriod {
     }
 
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    pub fn to_rasn_type(&self) -> asn1::PrivateKeyUsagePeriod {
-        asn1::PrivateKeyUsagePeriod {
+    pub fn to_rasn_type(&self) -> rasn_pkix::PrivateKeyUsagePeriod {
+        rasn_pkix::PrivateKeyUsagePeriod {
             not_before: self
                 .not_before_epoch_seconds
                 .map(crate::encdec::rasn::to_generalized_time),
@@ -115,7 +114,7 @@ impl PrivateKeyUsagePeriod {
     }
 
     /// Return a new instances.
-    fn from_rasn_type(private_key_usage_period: &asn1::PrivateKeyUsagePeriod) -> Self {
+    fn from_rasn_type(private_key_usage_period: &rasn_pkix::PrivateKeyUsagePeriod) -> Self {
         Self {
             not_before_epoch_seconds: private_key_usage_period
                 .not_before

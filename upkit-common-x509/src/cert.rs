@@ -18,7 +18,6 @@
 //! X.509 Certificate utilities.
 
 pub mod build;
-mod cert_asn1;
 pub mod extensions;
 pub mod parse;
 pub mod validate;

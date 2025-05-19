@@ -25,7 +25,7 @@
 //! * [RFC 8933](https://www.rfc-editor.org/rfc/rfc8933) Update to the CMS for Algorithm Identifier Protection
 //! * [RFC 6211](https://www.rfc-editor.org/rfc/rfc6211) CMS Algorithm Identifier Protection Attribute
 
-pub mod cms_asn1;
+//pub mod cms_asn1;
 pub mod types {
     //! Cryptographic Message Syntax (CMS) types.
 
