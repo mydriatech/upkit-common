@@ -69,11 +69,7 @@ impl BasicConstraints {
     /// Return the number of subordinate levels (including a leaf) that this CA
     /// allows. 0 hence means that no sub-CAs are allowed.
     pub fn path_len(&self) -> Option<usize> {
-        if self.ca {
-            self.path_len
-        } else {
-            None
-        }
+        if self.ca { self.path_len } else { None }
     }
 
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.

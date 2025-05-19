@@ -17,8 +17,8 @@
 
 //! PKCS#10 Certification request building.
 
-use tyst::traits::se::{PrivateKey, PublicKey};
 use tyst::Tyst;
+use tyst::traits::se::{PrivateKey, PublicKey};
 
 use crate::cert::extensions::Extensions;
 use crate::cert::types::DistinguishedName;

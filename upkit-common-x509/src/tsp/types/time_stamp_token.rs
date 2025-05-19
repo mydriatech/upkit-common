@@ -22,7 +22,6 @@ use crate::cert::extensions::ExtendedKeyUsage;
 use crate::cert::parse::CertificateParser;
 use crate::cms::types::SignedAttributes;
 use crate::tsp::build::TimeStampTokenSigner;
-use crate::tsp::tsp_asn1 as asn1;
 use rasn::types::Any;
 use rasn::types::ObjectIdentifier;
 use rasn::types::OctetString;
@@ -33,9 +32,9 @@ use rasn_cms::IssuerAndSerialNumber;
 use rasn_cms::SignedData;
 use rasn_cms::SignerIdentifier;
 use rasn_cms::SignerInfo;
+use tyst::Tyst;
 use tyst::encdec::hex::ToHex;
 use tyst::traits::se::ToPublicKey;
-use tyst::Tyst;
 
 /** RFC3161 TimeStampToken.
 
@@ -76,7 +75,9 @@ impl TimeStampToken {
             .contains(&ExtendedKeyUsage::PkixTimeStamping)
             && log::log_enabled!(log::Level::Debug)
         {
-            log::debug!("Signing certificate EKU does not explicitly declare that key can be used for Time-Stamping. Allowing this to proceed, but verification if this Time-Stamp might fail.");
+            log::debug!(
+                "Signing certificate EKU does not explicitly declare that key can be used for Time-Stamping. Allowing this to proceed, but verification if this Time-Stamp might fail."
+            );
         }
         if !cert_req {
             // https://www.rfc-editor.org/rfc/rfc3628.html#section-7.3.1.h mandates that the signer is identifiable (country, device etc).
@@ -229,13 +230,17 @@ impl TimeStampToken {
         attribute.
         */
         if signer_infos.len() != 1 {
-            log::debug!("The time-stamp token MUST NOT contain any signatures other than the signature of the TSA.");
+            log::debug!(
+                "The time-stamp token MUST NOT contain any signatures other than the signature of the TSA."
+            );
             return false;
         }
 
         let signer_info = signer_infos.first().unwrap();
         if !signer_info.digest_algorithm.eq(digest_algo) {
-            log::debug!("Wrong digest algorithm used by signed. (Only single signer support is implemented.)");
+            log::debug!(
+                "Wrong digest algorithm used by signed. (Only single signer support is implemented.)"
+            );
             return false;
         }
         let signed_attributes = SignedAttributes::from_rasn_type(&signer_info.signed_attrs);
@@ -363,7 +368,7 @@ impl TimeStampToken {
     }
 
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    pub fn from_rasn_type(time_stamp_token: &asn1::TimeStampToken) -> Option<Self> {
+    pub fn from_rasn_type(time_stamp_token: &rasn_cms::tsp::TimeStampToken) -> Option<Self> {
         if Self::is_signed_data(time_stamp_token) {
             Some(Self {
                 time_stamp_token_content: rasn::der::decode::<SignedData>(
@@ -377,7 +382,7 @@ impl TimeStampToken {
     }
 
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    pub fn to_rasn_type(&self) -> asn1::TimeStampToken {
+    pub fn to_rasn_type(&self) -> rasn_cms::tsp::TimeStampToken {
         rasn_cms::ContentInfo {
             content_type: rasn_cms::CONTENT_SIGNED_DATA.into(),
             content: Any::new(rasn::der::encode(&self.time_stamp_token_content).unwrap()),

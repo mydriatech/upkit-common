@@ -21,7 +21,6 @@ use crate::cert::types::DistinguishedName;
 use crate::cert::types::SerialNumber;
 use crate::cert::types::WellKnownGeneralName;
 use crate::tsp::parse::TimeStampReqParser;
-use crate::tsp::tsp_asn1 as asn1;
 use chrono::TimeZone;
 use rasn::types::Integer;
 use rasn::types::ObjectIdentifier;
@@ -31,7 +30,7 @@ use rasn::types::ObjectIdentifier;
 /// This contains among other things the actual time-stamp time.
 #[derive(Debug, Clone)]
 pub struct TstInfo {
-    tst_info: asn1::TstInfo,
+    tst_info: rasn_cms::tsp::TstInfo,
 }
 
 impl TstInfo {
@@ -42,8 +41,8 @@ impl TstInfo {
         point_in_time_epoch_micros: u64,
         accuracy_micros: u64,
     ) -> Self {
-        let tst_info = asn1::TstInfo {
-            version: 1,
+        let tst_info = rasn_cms::tsp::TstInfo {
+            version: 1.into(),
             policy: ObjectIdentifier::new_unchecked(policy_oid.to_vec().into()),
             message_imprint: time_stamp_req.get_message_imprint().to_owned(),
             serial_number: SerialNumber::default().to_rasn_type(),
@@ -51,7 +50,7 @@ impl TstInfo {
                 .timestamp_micros(i64::try_from(point_in_time_epoch_micros).unwrap())
                 .unwrap()
                 .fixed_offset(),
-            accuracy: Some(asn1::Accuracy {
+            accuracy: Some(rasn_cms::tsp::Accuracy {
                 seconds: Some(isize::try_from(accuracy_micros / 1_000_000).unwrap())
                     .filter(|value| value != &0)
                     .map(Integer::from),
@@ -163,14 +162,14 @@ impl TstInfo {
     }
 
     /// Return a new instance from the `rasn` ASN.1 library type.
-    pub fn from_rasn_type(tst_info: &asn1::TstInfo) -> Self {
+    pub fn from_rasn_type(tst_info: &rasn_cms::tsp::TstInfo) -> Self {
         Self {
             tst_info: tst_info.clone(),
         }
     }
 
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    pub fn to_rasn_type(self) -> asn1::TstInfo {
+    pub fn to_rasn_type(self) -> rasn_cms::tsp::TstInfo {
         self.tst_info
     }
 }

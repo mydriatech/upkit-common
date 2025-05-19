@@ -18,7 +18,6 @@
 //! Time-Stamp request builder.
 
 use crate::cert::types::SerialNumber;
-use crate::tsp::tsp_asn1 as asn1;
 use rasn::types::OctetString;
 
 /// Time-Stamp request builder.
@@ -32,9 +31,9 @@ impl TimeStampReq {
     /// When `cert_req` is `true` the time-stamping service should provide
     /// at least the signing certificate bundled with the response.
     pub fn new(cert_req: bool, digest_algorithm_oid: &[u32], digest_bytes: &[u8]) -> Self {
-        let time_stamp_req = asn1::TimeStampReq {
+        let time_stamp_req = rasn_cms::tsp::TimeStampReq {
             version: 1,
-            message_imprint: asn1::MessageImprint {
+            message_imprint: rasn_cms::tsp::MessageImprint {
                 hash_algorithm: crate::encdec::rasn::oid_as_algorithm_identifier(
                     digest_algorithm_oid,
                 ),
@@ -57,7 +56,7 @@ impl TimeStampReq {
     }
 
     /// Return value in a form that is easy to process by the ASN.1 library `rasn`.
-    pub fn to_rasn_type(&self) -> asn1::TimeStampReq {
+    pub fn to_rasn_type(&self) -> rasn_cms::tsp::TimeStampReq {
         rasn::der::decode(&self.time_stamp_req).unwrap()
     }
 }

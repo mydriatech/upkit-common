@@ -49,7 +49,8 @@ impl ExtensionChecker for KeyIdentifierChecker {
                     if !ski.eq(&last_aki) {
                         let msg = format!(
                             "[{i}]: AuthorityKeyIdentifier '{}' did not match issuer's SubjectKeyIdentifier '{}'.",
-                            last_aki.to_hex(), ski.to_hex(),
+                            last_aki.to_hex(),
+                            ski.to_hex(),
                         );
                         return Err(CertificateValidationErrorKind::ExtensionHandlingFailure
                             .error_with_msg(&msg));

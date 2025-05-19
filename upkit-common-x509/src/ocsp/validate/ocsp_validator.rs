@@ -20,17 +20,17 @@
 use std::sync::Arc;
 
 use crate::cert::parse::CertificateParser;
-use crate::cert::validate::checkers::OcspNoCheckChecker;
 use crate::cert::validate::CertificatePathValidator;
 use crate::cert::validate::CertificateValidationError;
 use crate::cert::validate::CertificateValidationErrorKind;
+use crate::cert::validate::checkers::OcspNoCheckChecker;
 use crate::crl::crl_entry_extensions::ReasonCode;
 use crate::ocsp::parse::OcspRequestParser;
 use crate::ocsp::parse::OcspResponseParser;
 use crate::ocsp::types::OcspResponseStatus;
+use tyst::Tyst;
 use tyst::encdec::hex::ToHex;
 use tyst::traits::se::ToPublicKey;
-use tyst::Tyst;
 
 /// Certificate validation using an OCSP response.
 pub struct CertificateOcspValidator {}

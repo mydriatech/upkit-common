@@ -21,9 +21,9 @@ use upkit_common_x509::cert::extensions::CertificatePolicy;
 use upkit_common_x509::cert::extensions::ExtendedKeyUsage;
 use upkit_common_x509::cert::extensions::WellKnownCertificatePolicy;
 use upkit_common_x509::cert::parse::CertificateParser;
+use upkit_common_x509::cert::validate::CertificatePathValidator;
 use upkit_common_x509::cert::validate::checkers::CertificatePoliciesChecker;
 use upkit_common_x509::cert::validate::checkers::ExtendedKeyUsageChecker;
-use upkit_common_x509::cert::validate::CertificatePathValidator;
 
 #[test]
 fn test_cert_path() {

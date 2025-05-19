@@ -149,13 +149,13 @@ impl CertificatePolicy {
             for policy_qualifier in policy_qualifiers {
                 match policy_qualifier.id.to_vec().as_slice() {
                     Self::OID_QUALIFIER_ID_CPS => {
-                        return Self::from_csp_policy(oid, policy_qualifier.qualifier.as_bytes())
+                        return Self::from_csp_policy(oid, policy_qualifier.qualifier.as_bytes());
                     }
                     Self::OID_QUALIFIER_ID_UNOTICE => {
                         return Self::from_user_notice_policy(
                             oid,
                             policy_qualifier.qualifier.as_bytes(),
-                        )
+                        );
                     }
                     unknown_qualifier => todo!("Unknown CP qualifier {unknown_qualifier:?}."),
                 }

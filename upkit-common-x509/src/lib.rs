@@ -29,7 +29,7 @@ pub mod ocsp;
 pub mod pkcs10;
 pub mod tsp;
 
-use tyst::{encdec::hex::ToHex, Tyst};
+use tyst::{Tyst, encdec::hex::ToHex};
 
 /// Create a lower case hex encoded SHA3-512 fingerprint of the `data`.
 pub fn fingerprint_data(data: &[u8]) -> String {

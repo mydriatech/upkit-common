@@ -17,8 +17,6 @@
 
 //! CMSAlgorithmProtection attribute.
 
-use crate::cms::cms_asn1 as asn1;
-
 /** CMSAlgorithmProtection attribute.
 
 By default in RFC 5652, only the message digest (and not the message digest
@@ -90,7 +88,7 @@ impl CmsAlgorithmProtectionAttribute {
 
     /// Return a new instance from the DER encoded attribute value.
     pub fn from_encoded(der_encoded: &[u8]) -> Option<Self> {
-        rasn::der::decode::<asn1::CmsAlgorithmProtection>(der_encoded)
+        rasn::der::decode::<rasn_cms::CmsAlgorithmProtection>(der_encoded)
             .ok()
             .and_then(|cap| {
                 cap.signature_algorithm.map(|signature_algorithm| Self {
@@ -102,7 +100,7 @@ impl CmsAlgorithmProtectionAttribute {
 
     /// Return the DER encoded attribute value.
     pub fn to_encoded(&self) -> Vec<u8> {
-        rasn::der::encode(&asn1::CmsAlgorithmProtection {
+        rasn::der::encode(&rasn_cms::CmsAlgorithmProtection {
             digest_algorithm: crate::encdec::rasn::oid_as_algorithm_identifier(
                 &self.digest_algorithm_oid,
             ),

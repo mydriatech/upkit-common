@@ -19,10 +19,10 @@
 
 use crate::cert::extensions::ExtendedKeyUsage;
 use crate::cert::parse::CertificateParser;
-use crate::cert::validate::checkers::ExtendedKeyUsageChecker;
 use crate::cert::validate::CertificatePathValidator;
 use crate::cert::validate::CertificateValidationError;
 use crate::cert::validate::CertificateValidationErrorKind;
+use crate::cert::validate::checkers::ExtendedKeyUsageChecker;
 use crate::crl::crl_entry_extensions::ReasonCode;
 use crate::crl::parse::CrlParser;
 use crate::crl::validate::CertificateCrlValidator;
