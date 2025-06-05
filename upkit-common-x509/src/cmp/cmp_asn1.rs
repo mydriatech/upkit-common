@@ -682,7 +682,7 @@ pub enum CertOrEncCert {
     //#[rasn(tag(explicit(1)))]
     //EncryptedCert(EncryptedValue),
     #[rasn(tag(explicit(1)))]
-    EncryptedCert(EncryptedKey),
+    EncryptedCert(Box<EncryptedKey>),
 }
 
 /** Key Recovery Response Content
