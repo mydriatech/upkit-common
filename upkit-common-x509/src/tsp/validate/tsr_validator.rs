@@ -35,7 +35,8 @@ use std::sync::Arc;
 pub struct TimeStampResponseValidator {}
 
 impl TimeStampResponseValidator {
-    /// Validate the time stamp response at the time claimed in the time-stamp.
+    /// Validate the time stamp response at the time claimed in the time-stamp
+    /// and return the expiration of the TSU signing certificate in microseconds.
     ///
     /// Validates that any bundled certificates can build a chain from TS
     /// signature to trust anchor.
@@ -50,7 +51,7 @@ impl TimeStampResponseValidator {
     pub fn validate_at_point_of_timestamp(
         trusted_anchors_der: Vec<Vec<u8>>,
         encoded_time_stamp_resp: &[u8],
-    ) -> Result<(), CertificateValidationError> {
+    ) -> Result<u64, CertificateValidationError> {
         // Parse timestamp
         let time_stamp_resp = TimeStampRespParser::from_bytes(encoded_time_stamp_resp).unwrap();
         let time_stamp_token = time_stamp_resp.get_time_stamp_token().ok_or(
@@ -146,7 +147,13 @@ impl TimeStampResponseValidator {
                 ))?
             }
         }
-        Ok(())
+        // Find out when Time-Stamp signature will expire
+        let expires_epoch_micros = ts_cert_chain.first().ok_or(
+            CertificateValidationErrorKind::NotTrusted.error_with_msg(
+                "No Time-Stamp signing certificate was present. This is highly unexpected at this point."
+            )
+        )?.get_validity().get_not_after() * 1_000_000;
+        Ok(expires_epoch_micros)
     }
 
     /// Calculate that actual revocation state of a cert from known stats changes
