@@ -50,7 +50,7 @@ env_logger = { version = "0.11", default-features = false, features = [] }
 rasn = { version = "0.26.6", default-features = false, features = []  }
 rasn-pkix = { version = "0.26.6", default-features = false, features = []  }
 rasn-cms = { version = "0.26.6", default-features = false, features = []  }
-rasn-ocsp = { version = "0.26.6", default-features = false, features = []  }
+rasn-ocsp = { version = "0.27.0", default-features = false, features = []  }
 rasn-smime = { version = "0.26.6", default-features = false, features = []  }
 
 # Serialization
