@@ -357,12 +357,11 @@ impl TimeStampToken {
             .content_type
             .as_ref()
             .eq(Self::OID_ID_CT_TST_INFO)
+            && let Some(content) = &self.time_stamp_token_content.encap_content_info.content
         {
-            if let Some(content) = &self.time_stamp_token_content.encap_content_info.content {
-                return Some(TstInfo::from_rasn_type(
-                    &rasn::der::decode(content).unwrap(),
-                ));
-            }
+            return Some(TstInfo::from_rasn_type(
+                &rasn::der::decode(content).unwrap(),
+            ));
         }
         None
     }

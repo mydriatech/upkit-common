@@ -114,10 +114,10 @@ impl SingleResponse {
     /// In practice this means that CAs generate the OCSP Response well before this point
     /// in time and `nextUpdate` is used as expiration date for a OCSP Response.
     pub fn is_valid_at(&self, point_in_time_epoch_seconds: u64) -> bool {
-        if let Some(next_update) = self.get_next_update() {
-            if point_in_time_epoch_seconds >= next_update {
-                return false;
-            }
+        if let Some(next_update) = self.get_next_update()
+            && point_in_time_epoch_seconds >= next_update
+        {
+            return false;
         }
         if point_in_time_epoch_seconds < self.get_this_update() {
             return false;

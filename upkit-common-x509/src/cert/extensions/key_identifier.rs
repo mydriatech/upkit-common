@@ -39,7 +39,7 @@ impl AuthorityKeyIdentifier {
     pub fn from_issuers_subject_key_identifier(issuer_subject_key_identifier: &[u8]) -> Self {
         Self {
             aki: rasn_pkix::AuthorityKeyIdentifier {
-                key_identifier: Some(rasn_pkix::SubjectKeyIdentifier::copy_from_slice(
+                key_identifier: Some(rasn_pkix::SubjectKeyIdentifier::from_slice(
                     issuer_subject_key_identifier,
                 )),
                 authority_cert_issuer: None,
