@@ -131,8 +131,7 @@ impl CertificateOcspValidator {
         if let Some(tbs_response_data) = ocsp_response.get_encoded_tbs_response_data() {
             if let Some((oid, signature)) = ocsp_response.get_encoded_signature() {
                 if let Some(mut se) = Tyst::instance().ses().by_oid(&oid) {
-                    if se.verify(public_key.as_ref(), &signature, &tbs_response_data)
-                    {
+                    if se.verify(public_key.as_ref(), &signature, &tbs_response_data) {
                         Ok(())
                     } else {
                         Err(
