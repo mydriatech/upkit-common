@@ -102,14 +102,21 @@ impl CertificateCrlValidator {
         let tbs_cert_list = crl.get_encoded_tbs_cert_list();
         let (oid, signature) = crl.get_encoded_signature();
         if let Some(mut se) = Tyst::instance().ses().by_oid(&oid) {
-            if !se.verify(public_key.as_ref(), &signature, &tbs_cert_list) {
+            if se.verify(public_key.as_ref(), &signature, &tbs_cert_list) {
+                Ok(())
+            } else {
                 Err(
                     CertificateValidationErrorKind::InvalidSignature.error_with_msg(
                         "CRL signature could not be validated with issuer certificate.",
                     ),
-                )?
+                )
             }
+        } else {
+            Err(
+                CertificateValidationErrorKind::InvalidSignature.error_with_msg(&format!(
+                    "CRL signature algorithm '{oid}' of issuer certificate is unknown."
+                )),
+            )
         }
-        Ok(())
     }
 }

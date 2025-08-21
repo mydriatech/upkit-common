@@ -158,7 +158,7 @@ impl PkiMessage {
             message_time,
             protection_alg: Some(protection_alg),
             // EJBCA CE 9.1.1 requires the sender kid to be set in order to do PBMAC1 response protection.
-            sender_kid: Some(OctetString::new()),
+            sender_kid: Some(OctetString::from_slice(&[])),
             recip_kid: None,
             transaction_id: Some(OctetString::from(Self::get_random_bytes(128 >> 3))),
             sender_nonce: Some(OctetString::from(Self::get_random_bytes(128 >> 3))),

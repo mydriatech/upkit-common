@@ -39,11 +39,11 @@ pub fn parse(textual_encoding: &str) -> Result<Vec<(Marker, Vec<u8>)>, DecodingE
             && line.ends_with(Marker::END_LINE_FINISH)
         {
             ret.push(content.take().unwrap());
-        } else if content.is_some() {
+        } else if let Some(content) = content.as_mut() {
             // There should be 64 base64-chars on each line except for the last one
             let decoded = &tyst::encdec::base64::decode(line)
                 .map_err(|e| DecodingError::with_msg(&e.to_string()))?;
-            content.as_mut().unwrap().1.extend_from_slice(decoded);
+            content.1.extend_from_slice(decoded);
         }
     }
     if content.is_some() {
