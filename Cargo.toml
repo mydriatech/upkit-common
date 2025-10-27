@@ -51,7 +51,7 @@ rasn = { version = "0.27.1", default-features = false, features = ["bytes"]  }
 rasn-pkix = { version = "0.27.1", default-features = false, features = []  }
 rasn-cms = { version = "0.27.1", default-features = false, features = []  }
 rasn-ocsp = { version = "0.27.1", default-features = false, features = []  }
-rasn-smime = { version = "0.27.1", default-features = false, features = []  }
+rasn-smime = { version = "0.28.0", default-features = false, features = []  }
 
 # Serialization
 serde = { version = "1.0", default-features = true, features = ["derive"] }
